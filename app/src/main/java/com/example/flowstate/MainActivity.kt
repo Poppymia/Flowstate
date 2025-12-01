@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.flowstate.features.DashboardScreen
 import com.example.flowstate.ui.theme.FlowstateTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,27 +21,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             FlowstateTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
+                    DashboardScreen(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(modifier: Modifier = Modifier) {
-    Text(
-        text = "I love kotlinnnn",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    FlowstateTheme {
-        Greeting()
     }
 }
