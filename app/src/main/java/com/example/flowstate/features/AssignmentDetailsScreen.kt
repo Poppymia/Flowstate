@@ -1,6 +1,7 @@
 package com.example.flowstate.features
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,18 +33,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.flowstate.data.FlowstateDatabaseHelper
@@ -52,9 +51,13 @@ import com.example.flowstate.models.Assignment
 import com.example.flowstate.models.AssignmentDetailsViewModel
 import com.example.flowstate.models.AssignmentRepository
 
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
+
 //TODO: create assignment details edit screen and carry editable composable components over there
 
-//@Preview(showBackground = true)
 @Composable
 fun AssignmentDetailsScreen(
     assignmentId: String,
@@ -87,41 +90,13 @@ fun AssignmentDetailsScreen(
             AssignmentCard(
                 assignment = assignment,
                 progress = viewModel.progress,
-                readOnly = true,
-                onToggleSubtask = { sub -> viewModel.toggleSubtask(sub) },
+                onToggleSubtask = { subtask -> viewModel.toggleSubtask(subtask) },
+                readOnly = false,
                 onEditClick = { navController.navigate("edit/$assignmentId") }
             )
         }
     }
 }
-
-
-
-//@Composable
-//fun AssignmentDetailsScreen(modifier: Modifier = Modifier) {
-//    Scaffold(
-//        floatingActionButton = {
-//            FloatingActionButton(
-//                onClick = {},
-//                containerColor = Color(0xFFE8F28D)
-//            ) {
-//                Icon(Icons.Default.Add, contentDescription = "Add")
-//            }
-//        },
-//        containerColor = Color(0xFFE9E0D7) // Beige background
-//    ) { padding ->
-//
-//        Box(
-//            modifier = Modifier
-//                .padding(padding)
-//                .padding(24.dp)
-//                .fillMaxSize(),
-//            contentAlignment = Alignment.TopCenter
-//        ) {
-//            AssignmentCard()
-//        }
-//    }
-//}
 
 @Composable
 fun AssignmentCard(
@@ -129,7 +104,8 @@ assignment: Assignment,
 progress: Float,
 onToggleSubtask: (Subtask) -> Unit,
 readOnly: Boolean,
-onEditClick: () -> Unit
+onEditClick: () -> Unit,
+
 ) {
     val cs = MaterialTheme.colorScheme
 
@@ -155,7 +131,9 @@ onEditClick: () -> Unit
             Icon(
                 Icons.Default.Edit,
                 contentDescription = "Edit",
-                modifier = Modifier.size(24.dp).padding(4.dp),
+                modifier = Modifier
+                    .size(24.dp)
+                    .padding(4.dp),
                 tint = cs.onSurface
             )
         }
@@ -177,9 +155,13 @@ onEditClick: () -> Unit
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.CalendarMonth, contentDescription = null)
             Spacer(Modifier.width(8.dp))
-
             Text(
-                assignment.dueDate.toString(),
+                text = remember(assignment.dueDate) {
+                    val formatter = SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a", Locale.getDefault())
+                    // FIX: Change the TimeZone to EST/EDT
+                    formatter.timeZone = TimeZone.getTimeZone("America/New_York")
+                    formatter.format(Date(assignment.dueDate))
+                },
                 style = MaterialTheme.typography.bodyLarge
             )
         }
@@ -206,7 +188,8 @@ onEditClick: () -> Unit
         assignment.subtasks.forEach { subtask ->
             SubtaskRow(
                 subtask = subtask,
-                onToggle = { if (!readOnly) onToggleSubtask(subtask) }
+                onToggle = { onToggleSubtask(subtask) },
+                isReadOnly = readOnly
             )
             Spacer(Modifier.height(12.dp))
         }
@@ -338,21 +321,35 @@ fun NotesBox() {
 }
 
 @Composable
-fun SubtaskRow(subtask: Subtask, onToggle: () -> Unit) {
+fun SubtaskRow(
+    subtask: Subtask,
+    onToggle: () -> Unit,
+    isReadOnly: Boolean
+) {
     Row(
-        Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-
-            Checkbox(
-                checked = subtask.isChecked,
-                onCheckedChange = { onToggle() } // always allowed but other components are only allowed on edit
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                // The row is only clickable if it's NOT read-only
+                enabled = !isReadOnly,
+                onClick = onToggle
             )
-
-            Spacer(Modifier.width(12.dp))
-            Text(subtask.text)
-        }
+    ) {
+        Checkbox(
+            checked = subtask.isChecked,
+            // When checked state changes call the onToggle lambda
+            onCheckedChange = { onToggle() },
+            enabled = !isReadOnly
+        )
+        Spacer(Modifier.width(12.dp))
+        Text(
+            text = subtask.text,
+            style = if (subtask.isChecked) {
+                LocalTextStyle.current.copy(textDecoration = TextDecoration.LineThrough, color = Color.Gray)
+            } else {
+                LocalTextStyle.current
+            }
+        )
     }
 }

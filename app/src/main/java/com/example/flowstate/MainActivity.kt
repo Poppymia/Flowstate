@@ -55,6 +55,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.flowstate.features.AssignmentDetailsEditScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -135,6 +136,20 @@ class MainActivity : ComponentActivity() {
                                 dbHelper = dbHelper
                             )
                         }
+
+                        // In your NavHost
+                        composable("edit/{assignmentId}") { backStackEntry ->
+                            val assignmentId = backStackEntry.arguments?.getString("assignmentId")
+                            if (assignmentId != null) {
+                                AssignmentDetailsEditScreen(
+                                    assignmentId = assignmentId,
+                                    navController = navController,
+                                    dbHelper = dbHelper
+                                )
+                            }
+                        }
+
+
                     }
                 }
             }

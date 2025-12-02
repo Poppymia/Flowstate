@@ -32,7 +32,8 @@ class FlowstateDatabaseHelper(context: Context) :
                 id TEXT PRIMARY KEY,
                 assignmentId TEXT,
                 text TEXT,
-                isChecked INTEGER
+                isChecked INTEGER,
+                weight INTEGER
             )
         """)
     }
@@ -128,6 +129,7 @@ class FlowstateDatabaseHelper(context: Context) :
             put("assignmentId", assignmentId)
             put("text", subtask.text)
             put("isChecked", if (subtask.isChecked) 1 else 0)
+            put("weight", subtask.weight)
         }
         db.insert("subtasks", null, values)
         //db.close()

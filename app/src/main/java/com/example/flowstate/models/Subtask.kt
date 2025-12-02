@@ -6,5 +6,6 @@ data class Subtask (
     val id: String = UUID.randomUUID().toString(),
     val assignmentId: String,
     val text: String,
-    val isChecked: Boolean = false
+    val isChecked: Boolean = false,
+    val weight: Int = 0
 )

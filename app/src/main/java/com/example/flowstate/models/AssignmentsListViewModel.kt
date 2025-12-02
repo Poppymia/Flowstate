@@ -1,10 +1,5 @@
 package com.example.flowstate.models
 
-/*
-class AssignmentsListViewModel {
-
-}
-*/
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
@@ -15,8 +10,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 class AssignmentsListViewModel : ViewModel() {
 
-    // Pretend this comes from the database
-    // In your real app, this will be repo.getAssignments()
     private val _assignments = MutableStateFlow<List<Assignment>>(emptyList())
     val assignments: StateFlow<List<Assignment>> = _assignments
 
@@ -27,24 +20,17 @@ class AssignmentsListViewModel : ViewModel() {
     private val _selectedCourse = mutableStateOf("All Courses")
     val selectedCourse: State<String> = _selectedCourse
 
-    // ---------------------------
     // Update filter chip selection
-    // ---------------------------
     fun setFilter(filter: String) {
         _selectedFilter.value = filter
     }
 
-    // ---------------------------
     // Update dropdown selection
-    // ---------------------------
     fun setCourseFilter(course: String) {
         _selectedCourse.value = course
     }
 
-    // ---------------------------
-    // TEMP: Populate sample data
-    // In your real app, remove this and load from SQLite repo
-    // ---------------------------
+    // TEMP: Populate sample data remove this and load from SQLite repo
     fun loadSampleData() {
         _assignments.value = listOf(
             Assignment(

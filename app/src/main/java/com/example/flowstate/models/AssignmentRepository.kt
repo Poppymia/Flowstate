@@ -1,5 +1,6 @@
 package com.example.flowstate.models
 
+import android.content.ContentValues
 import com.example.flowstate.data.FlowstateDatabaseHelper
 
 class AssignmentRepository(private val dbHelper: FlowstateDatabaseHelper) {
@@ -50,7 +51,8 @@ class AssignmentRepository(private val dbHelper: FlowstateDatabaseHelper) {
                     id = cursor.getString(cursor.getColumnIndexOrThrow("id")),
                     assignmentId = assignmentId,
                     text = cursor.getString(cursor.getColumnIndexOrThrow("text")),
-                    isChecked = cursor.getInt(cursor.getColumnIndexOrThrow("isChecked")) == 1
+                    isChecked = cursor.getInt(cursor.getColumnIndexOrThrow("isChecked")) == 1,
+                    weight = cursor.getInt(cursor.getColumnIndexOrThrow("weight"))
                 )
             )
         }
@@ -58,6 +60,48 @@ class AssignmentRepository(private val dbHelper: FlowstateDatabaseHelper) {
         cursor.close()
         return subtasks
     }
+
+    fun updateAssignment(assignment: Assignment) {
+        val db = dbHelper.writableDatabase
+
+        // Begin a database transaction
+        db.beginTransaction()
+        try {
+            //Update the main assignment details in the 'assignments' table
+            val assignmentValues = ContentValues().apply {
+                put("title", assignment.title)
+                put("courseId", assignment.courseId)
+                put("priority", assignment.priority)
+                put("notes", assignment.notes)
+                put("dueDate", assignment.dueDate)
+            }
+            db.update("assignments", assignmentValues, "id = ?", arrayOf(assignment.id))
+
+            // Clear all existing subtasks for this assignment to handle deletions
+            db.delete("subtasks", "assignmentId = ?", arrayOf(assignment.id))
+
+            // Insert the new/updated list of subtasks
+            assignment.subtasks.forEach { subtask ->
+                val subtaskValues = ContentValues().apply {
+                    // Use existing ID to be safe
+                    put("id", subtask.id)
+                    put("assignmentId", assignment.id)
+                    put("text", subtask.text)
+                    put("isChecked", if (subtask.isChecked) 1 else 0)
+                    put("weight", subtask.weight)
+                }
+                db.insert("subtasks", null, subtaskValues)
+            }
+
+            // Mark the transaction as successful
+            db.setTransactionSuccessful()
+        } finally {
+            // End the transaction. If it wasn't successful, changes will be rolled back.
+            db.endTransaction()
+        }
+    }
+
+
 
     fun toggleSubtask(subtaskId: String, newValue: Boolean) {
         val db = dbHelper.writableDatabase
