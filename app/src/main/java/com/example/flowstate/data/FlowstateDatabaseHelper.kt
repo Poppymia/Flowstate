@@ -205,6 +205,4 @@ class FlowstateDatabaseHelper(context: Context) :
         cursor.close()
         return count > 0
     }
-
-
 }
