@@ -66,7 +66,7 @@ class FlowstateDatabaseHelper(context: Context) :
             insertSubtask(subtask, a.id)
         }
 
-        db.close()
+        //db.close()
     }
 
     fun getAllAssignments(): List<Assignment> {
@@ -87,6 +87,7 @@ class FlowstateDatabaseHelper(context: Context) :
             val actualGrade = cursor.getInt(9)
             val isCompleted = cursor.getInt(10) == 1
 
+            //
             val subtasks = getSubtasksForAssignment(id)
 
             assignments.add(
@@ -108,7 +109,7 @@ class FlowstateDatabaseHelper(context: Context) :
         }
 
         cursor.close()
-        db.close()
+        //db.close()
         return assignments
     }
 
@@ -116,7 +117,7 @@ class FlowstateDatabaseHelper(context: Context) :
         val db = writableDatabase
         db.delete("assignments", "id=?", arrayOf(id))
         db.delete("subtasks", "assignmentId=?", arrayOf(id))
-        db.close()
+        //db.close()
     }
 
     ///subtask CRUD functions
@@ -129,7 +130,7 @@ class FlowstateDatabaseHelper(context: Context) :
             put("isChecked", if (subtask.isChecked) 1 else 0)
         }
         db.insert("subtasks", null, values)
-        db.close()
+        //db.close()
     }
 
     fun getSubtasksForAssignment(assignmentId: String): List<Subtask> {
@@ -148,6 +149,7 @@ class FlowstateDatabaseHelper(context: Context) :
             subtasks.add(
                 Subtask(
                     id = id,
+                    assignmentId = assignmentId,
                     text = text,
                     isChecked = isChecked
                 )
@@ -155,7 +157,54 @@ class FlowstateDatabaseHelper(context: Context) :
         }
 
         cursor.close()
-        db.close()
+        //db.close()
         return subtasks
     }
+
+    //for testing
+    fun insertAssignment(
+        id: String,
+        title: String,
+        courseId: String,
+        dueDate: Long,
+        priority: Int,
+        progress: Int,
+        notes: String?
+    ) {
+        val db = writableDatabase
+        val cv = ContentValues()
+
+        cv.put("id", id)
+        cv.put("title", title)
+        cv.put("courseId", courseId)
+        cv.put("dueDate", dueDate)
+        cv.put("priority", priority)
+        cv.put("progress", progress)
+        cv.put("notes", notes)
+
+        db.insert("assignments", null, cv)
+    }
+
+    fun insertSubtask(id: String, assignmentId: String, text: String, isChecked: Boolean) {
+        val db = writableDatabase
+        val cv = ContentValues()
+
+        cv.put("id", id)
+        cv.put("assignmentId", assignmentId)
+        cv.put("text", text)
+        cv.put("isChecked", if (isChecked) 1 else 0)
+
+        db.insert("subtasks", null, cv)
+    }
+
+    fun hasAssignments(): Boolean {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT COUNT(*) FROM assignments", null)
+        cursor.moveToFirst()
+        val count = cursor.getInt(0)
+        cursor.close()
+        return count > 0
+    }
+
+
 }
