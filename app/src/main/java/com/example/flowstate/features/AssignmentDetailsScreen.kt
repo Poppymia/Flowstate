@@ -54,7 +54,7 @@ import com.example.flowstate.models.AssignmentRepository
 
 //TODO: create assignment details edit screen and carry editable composable components over there
 
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
 fun AssignmentDetailsScreen(
     assignmentId: String,
@@ -356,6 +356,3 @@ fun SubtaskRow(subtask: Subtask, onToggle: () -> Unit) {
         }
     }
 }
-
-
-
