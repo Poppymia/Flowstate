@@ -23,5 +23,11 @@ fun DashboardScreen(
             Text("Open Test Assignment")
         }
 
+        Button(onClick = {
+            navController.navigate("assignments")
+        }) {
+            Text("Open Assignments List")
+        }
+
     }
 }

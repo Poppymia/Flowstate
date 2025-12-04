@@ -56,6 +56,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.flowstate.features.AssignmentDetailsEditScreen
+import com.example.flowstate.features.AssignmentsListScreen
+import com.example.flowstate.models.AssignmentsListViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -67,6 +69,7 @@ class MainActivity : ComponentActivity() {
             FlowstateTheme {
                 val navController = rememberNavController()
                 val dbHelper = FlowstateDatabaseHelper(this)
+                val assignmentsListViewModel = AssignmentsListViewModel(dbHelper)
 
                 // Seed sample data on first launch
                 if (!dbHelper.hasAssignments()) {
@@ -107,8 +110,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
-                    NavHost(
+                    /*NavHost(
                         navController = navController,
                         startDestination = "dashboard",
                         modifier = Modifier.padding(innerPadding)
@@ -150,6 +152,38 @@ class MainActivity : ComponentActivity() {
                         }
 
 
+                    }*/
+
+                    NavHost(
+                        navController = navController,
+                        startDestination = "dashboard",
+                        modifier = Modifier.padding(innerPadding)
+                    ) {
+
+                        composable("dashboard") {
+                            DashboardScreen(
+                                navController = navController,
+                                dbHelper = dbHelper
+                            )
+                        }
+
+                        composable(
+                            route = "details/{id}",
+                            arguments = listOf(navArgument("id") { type = NavType.StringType })
+                        ) { backStackEntry ->
+                            val assignmentId = backStackEntry.arguments?.getString("id") ?: return@composable
+
+                            AssignmentDetailsScreen(
+                                assignmentId = assignmentId,
+                                navController = navController,
+                                dbHelper = dbHelper
+                            )
+                        }
+
+                        // NEW: Assignments List Screen
+                        composable("assignments") {
+                            AssignmentsListScreen(assignmentsListViewModel)
+                        }
                     }
                 }
             }
