@@ -59,6 +59,7 @@ import com.example.flowstate.features.AssignmentDetailsEditScreen
 import com.example.flowstate.features.AssignmentsListScreen
 import com.example.flowstate.models.AssignmentsListViewModel
 
+/*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,10 +67,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
+
             FlowstateTheme {
                 val navController = rememberNavController()
                 val dbHelper = FlowstateDatabaseHelper(this)
-                val assignmentsListViewModel = AssignmentsListViewModel(dbHelper)
 
                 // Seed sample data on first launch
                 if (!dbHelper.hasAssignments()) {
@@ -110,7 +111,8 @@ class MainActivity : ComponentActivity() {
                 }
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    /*NavHost(
+                    */
+/*NavHost(
                         navController = navController,
                         startDestination = "dashboard",
                         modifier = Modifier.padding(innerPadding)
@@ -152,7 +154,8 @@ class MainActivity : ComponentActivity() {
                         }
 
 
-                    }*/
+                    }*//*
+
 
                     NavHost(
                         navController = navController,
@@ -182,6 +185,82 @@ class MainActivity : ComponentActivity() {
 
                         // NEW: Assignments List Screen
                         composable("assignments") {
+                            AssignmentsListScreen(assignmentsListViewModel)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+*/
+
+class MainActivity : ComponentActivity() {
+
+    private lateinit var assignmentsListViewModel: AssignmentsListViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
+        val dbHelper = FlowstateDatabaseHelper(this)
+
+        // ✔ Create ViewModel OUTSIDE Compose
+        assignmentsListViewModel = AssignmentsListViewModel(dbHelper)
+
+        // ✔ Seed sample data BEFORE Compose
+        if (!dbHelper.hasAssignments()) {
+            val sampleId = "test-assignment-1"
+
+            dbHelper.insertAssignment(
+                id = sampleId,
+                title = "PROG3211 Final Project",
+                courseId = "PROG3211",
+                dueDate = System.currentTimeMillis() + (86400000 * 3),
+                priority = 2,
+                progress = 0,
+                notes = "Start working on UI & database"
+            )
+
+            dbHelper.insertSubtask("st-1", sampleId, "Design UI screens", false)
+            dbHelper.insertSubtask("st-2", sampleId, "Implement local DB", false)
+            dbHelper.insertSubtask("st-3", sampleId, "Test navigation", false)
+        }
+
+        setContent {
+            FlowstateTheme {
+                val navController = rememberNavController()
+
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    NavHost(
+                        navController = navController,
+                        startDestination = "dashboard",
+                        modifier = Modifier.padding(innerPadding)
+                    ) {
+
+                        composable("dashboard") {
+                            DashboardScreen(
+                                navController = navController,
+                                dbHelper = dbHelper
+                            )
+                        }
+
+                        composable(
+                            route = "details/{id}",
+                            arguments = listOf(navArgument("id") { type = NavType.StringType })
+                        ) { backStackEntry ->
+                            val assignmentId =
+                                backStackEntry.arguments?.getString("id") ?: return@composable
+
+                            AssignmentDetailsScreen(
+                                assignmentId = assignmentId,
+                                navController = navController,
+                                dbHelper = dbHelper
+                            )
+                        }
+
+                        composable("assignments") {
+                            // ✔ Pass already-created ViewModel
                             AssignmentsListScreen(assignmentsListViewModel)
                         }
                     }
