@@ -187,9 +187,12 @@ fun NavigationGraph(
             AssignmentsListScreen(viewModel = assignmentsListViewModel, navController = navController)
         }
 
-        // Profile Screen
+        // Profile Screen - NOW WITH DATABASE HELPER
         composable(Screen.Profile.route) {
-            ProfileScreen(navController = navController)
+            ProfileScreen(
+                navController = navController,
+                dbHelper = dbHelper
+            )
         }
 
         // Assignment Details Screen

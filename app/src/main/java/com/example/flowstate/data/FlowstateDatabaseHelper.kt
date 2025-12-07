@@ -5,11 +5,10 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import com.example.flowstate.models.Assignment
+import com.example.flowstate.models.Course
 import com.example.flowstate.models.Subtask
 
-//changed version to 2 from 1 for testing the colour var
 class FlowstateDatabaseHelper(context: Context) :
     SQLiteOpenHelper(context, "flowstate.db", null, 2) {
 
@@ -41,13 +40,58 @@ class FlowstateDatabaseHelper(context: Context) :
                 weight INTEGER
             )
         """)
+
+        db?.execSQL("""
+            CREATE TABLE courses (
+                id TEXT PRIMARY KEY,
+                courseCode TEXT NOT NULL,
+                courseName TEXT NOT NULL,
+                term TEXT NOT NULL,
+                isCurrentTerm INTEGER DEFAULT 0,
+                progress INTEGER DEFAULT 0
+            )
+        """)
+
+        db?.execSQL("""
+            CREATE TABLE case_studies (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                courseId TEXT NOT NULL,
+                caseStudyName TEXT NOT NULL,
+                FOREIGN KEY(courseId) REFERENCES courses(id)
+            )
+        """)
     }
 
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+
+override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+    if (oldVersion < 2) {
+        db?.execSQL("""
+                CREATE TABLE IF NOT EXISTS courses (
+                    id TEXT PRIMARY KEY,
+                    courseCode TEXT NOT NULL,
+                    courseName TEXT NOT NULL,
+                    term TEXT NOT NULL,
+                    isCurrentTerm INTEGER DEFAULT 0,
+                    progress INTEGER DEFAULT 0
+                )
+            """)
+
+        db?.execSQL("""
+                CREATE TABLE IF NOT EXISTS case_studies (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    courseId TEXT NOT NULL,
+                    caseStudyName TEXT NOT NULL,
+                    FOREIGN KEY(courseId) REFERENCES courses(id)
+                )
+            """)
+    }
+}
+
+   /* override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         db?.execSQL("DROP TABLE IF EXISTS assignments")
         db?.execSQL("DROP TABLE IF EXISTS subtasks")
         onCreate(db)
-    }
+    }*/
 
     ///assignment CRUD functions
     fun insertAssignment(a: Assignment) {
@@ -64,7 +108,6 @@ class FlowstateDatabaseHelper(context: Context) :
             put("expectedGrade", a.expectedGrade)
             put("actualGrade", a.actualGrade)
             put("isCompleted", if (a.isCompleted) 1 else 0)
-            put("colorHex", "#${Integer.toHexString(a.color.toArgb()).uppercase()}")
         }
         db.insert("assignments", null, values)
 
@@ -95,8 +138,6 @@ class FlowstateDatabaseHelper(context: Context) :
             val isCompleted = cursor.getInt(10) == 1
             val colorHex = cursor.getString(cursor.getColumnIndexOrThrow("colorHex"))
             val color = Color(android.graphics.Color.parseColor(colorHex))
-
-            //
             val subtasks = getSubtasksForAssignment(id)
 
             assignments.add(
@@ -113,7 +154,11 @@ class FlowstateDatabaseHelper(context: Context) :
                     actualGrade = actualGrade,
                     subtasks = subtasks,
                     isCompleted = isCompleted,
-                    color = color
+                    color = Color(
+                        red = (100..255).random(),
+                        green = (100..255).random(),
+                        blue = (100..255).random()
+                    )
                 )
             )
         }
@@ -172,6 +217,128 @@ class FlowstateDatabaseHelper(context: Context) :
         return subtasks
     }
 
+    fun insertCourse(course: Course) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("id", course.id)
+            put("courseCode", course.courseCode)
+            put("courseName", course.courseName)
+            put("term", course.term)
+            put("isCurrentTerm", if (course.isCurrentTerm) 1 else 0)
+            put("progress", course.progress)
+        }
+        db.insert("courses", null, values)
+        course.caseStudies.forEach { caseStudyName ->
+            insertCaseStudy(course.id, caseStudyName)
+        }
+    }
+
+    fun getAllCourses(): List<Course> {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM courses ORDER BY isCurrentTerm DESC, term DESC", null)
+        val courses = mutableListOf<Course>()
+
+        while (cursor.moveToNext()) {
+            val id = cursor.getString(cursor.getColumnIndexOrThrow("id"))
+            val courseCode = cursor.getString(cursor.getColumnIndexOrThrow("courseCode"))
+            val courseName = cursor.getString(cursor.getColumnIndexOrThrow("courseName"))
+            val term = cursor.getString(cursor.getColumnIndexOrThrow("term"))
+            val isCurrentTerm = cursor.getInt(cursor.getColumnIndexOrThrow("isCurrentTerm")) == 1
+            val progress = cursor.getInt(cursor.getColumnIndexOrThrow("progress"))
+            val caseStudies = getCaseStudiesForCourse(id)
+
+            courses.add(
+                Course(
+                    id = id,
+                    courseCode = courseCode,
+                    courseName = courseName,
+                    term = term,
+                    caseStudies = caseStudies,
+                    isCurrentTerm = isCurrentTerm,
+                    progress = progress
+                )
+            )
+        }
+        cursor.close()
+        return courses
+    }
+
+    fun getPastTermCourses(): List<Course> {
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT * FROM courses WHERE isCurrentTerm = 0 ORDER BY term DESC",
+            null
+        )
+        val courses = mutableListOf<Course>()
+
+        while (cursor.moveToNext()) {
+            val id = cursor.getString(cursor.getColumnIndexOrThrow("id"))
+            val courseCode = cursor.getString(cursor.getColumnIndexOrThrow("courseCode"))
+            val courseName = cursor.getString(cursor.getColumnIndexOrThrow("courseName"))
+            val term = cursor.getString(cursor.getColumnIndexOrThrow("term"))
+            val isCurrentTerm = cursor.getInt(cursor.getColumnIndexOrThrow("isCurrentTerm")) == 1
+            val progress = cursor.getInt(cursor.getColumnIndexOrThrow("progress"))
+            val caseStudies = getCaseStudiesForCourse(id)
+
+            courses.add(
+                Course(
+                    id = id,
+                    courseCode = courseCode,
+                    courseName = courseName,
+                    term = term,
+                    caseStudies = caseStudies,
+                    isCurrentTerm = isCurrentTerm,
+                    progress = progress
+                )
+            )
+        }
+        cursor.close()
+        return courses
+    }
+
+    fun getCurrentTermProgress(): Int {
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT AVG(progress) FROM courses WHERE isCurrentTerm = 1",
+            null
+        )
+        var avgProgress = 0
+        if (cursor.moveToFirst()) {
+            avgProgress = cursor.getInt(0)
+        }
+        cursor.close()
+        return avgProgress
+    }
+
+    fun deleteCourse(id: String) {
+        val db = writableDatabase
+        db.delete("courses", "id=?", arrayOf(id))
+        db.delete("case_studies", "courseId=?", arrayOf(id))
+    }
+
+    private fun insertCaseStudy(courseId: String, caseStudyName: String) {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put("courseId", courseId)
+            put("caseStudyName", caseStudyName)
+        }
+        db.insert("case_studies", null, values)
+    }
+
+    private fun getCaseStudiesForCourse(courseId: String): List<String> {
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT caseStudyName FROM case_studies WHERE courseId=?",
+            arrayOf(courseId)
+        )
+        val caseStudies = mutableListOf<String>()
+        while (cursor.moveToNext()) {
+            caseStudies.add(cursor.getString(0))
+        }
+        cursor.close()
+        return caseStudies
+    }
+
     //for testing
     fun insertAssignment(
         id: String,
@@ -211,6 +378,15 @@ class FlowstateDatabaseHelper(context: Context) :
     fun hasAssignments(): Boolean {
         val db = readableDatabase
         val cursor = db.rawQuery("SELECT COUNT(*) FROM assignments", null)
+        cursor.moveToFirst()
+        val count = cursor.getInt(0)
+        cursor.close()
+        return count > 0
+    }
+
+    fun hasCourses(): Boolean {
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT COUNT(*) FROM courses", null)
         cursor.moveToFirst()
         val count = cursor.getInt(0)
         cursor.close()
