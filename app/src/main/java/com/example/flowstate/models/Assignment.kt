@@ -1,5 +1,6 @@
 package com.example.flowstate.models
 
+import androidx.compose.ui.graphics.Color
 import java.util.UUID
 
 data class Assignment (
@@ -14,5 +15,7 @@ data class Assignment (
     val expectedGrade: Int? = null,
     val actualGrade: Int? = null,
     val subtasks: List<Subtask> = emptyList(),
-    val isCompleted: Boolean = false
+    val isCompleted: Boolean = false,
+    val color: Color = Color(0xFFFBDE98) // user can change the color or it will be default
+
 )

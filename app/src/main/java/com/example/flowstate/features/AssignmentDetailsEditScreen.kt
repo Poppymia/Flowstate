@@ -42,6 +42,7 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerDialog
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.ui.graphics.Color
 import java.util.Calendar
 import java.util.TimeZone
 
@@ -535,7 +536,8 @@ fun AssignmentDetailsEditScreenPreview() {
             Subtask(id = "s2", assignmentId = "1", text = "Implement ViewModel")
             //TODO add placeholder weights for preview
         ),
-        progress = 0
+        progress = 0,
+        color = Color(0xFFFBDE98)
     )
 
     // Local state for preview

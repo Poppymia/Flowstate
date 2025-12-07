@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteOpenHelper
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
+import androidx.compose.ui.graphics.Color
 import com.example.flowstate.models.Assignment
 import com.example.flowstate.models.Subtask
 
@@ -23,8 +24,10 @@ class FlowstateDatabaseHelper(context: Context) :
                 estimatedTimeMinutes INTEGER,
                 expectedGrade INTEGER,
                 actualGrade INTEGER,
-                isCompleted INTEGER
-            )
+                isCompleted INTEGER,
+                colorHex TEXT DEFAULT '#FBDE98'
+            );
+
         """)
 
         db?.execSQL("""
@@ -104,7 +107,12 @@ class FlowstateDatabaseHelper(context: Context) :
                     expectedGrade = expectedGrade,
                     actualGrade = actualGrade,
                     subtasks = subtasks,
-                    isCompleted = isCompleted
+                    isCompleted = isCompleted,
+                    color = Color(
+                        red = (100..255).random(),
+                        green = (100..255).random(),
+                        blue = (100..255).random()
+                    )
                 )
             )
         }

@@ -1,12 +1,14 @@
 package com.example.flowstate.models
 
 import android.content.ContentValues
+import androidx.compose.ui.graphics.Color
 import com.example.flowstate.data.FlowstateDatabaseHelper
 
 class AssignmentRepository(private val dbHelper: FlowstateDatabaseHelper) {
 
     fun getAssignment(id: String): Assignment? {
         val db = dbHelper.readableDatabase
+
 
         val cursor = db.rawQuery(
             "SELECT * FROM assignments WHERE id = ?",
@@ -17,6 +19,8 @@ class AssignmentRepository(private val dbHelper: FlowstateDatabaseHelper) {
             cursor.close()
             return null
         }
+        val hex = cursor.getString(cursor.getColumnIndexOrThrow("colorHex"))
+        val assignmentColor = Color(android.graphics.Color.parseColor(hex))
 
         val assignment = Assignment(
             id = cursor.getString(cursor.getColumnIndexOrThrow("id")),
@@ -30,7 +34,8 @@ class AssignmentRepository(private val dbHelper: FlowstateDatabaseHelper) {
             actualGrade = cursor.getInt(cursor.getColumnIndexOrThrow("actualGrade")),
             progress = cursor.getInt(cursor.getColumnIndexOrThrow("progress")),
             isCompleted = cursor.getInt(cursor.getColumnIndexOrThrow("isCompleted")) == 1,
-            subtasks = getSubtasksByAssignmentId(id)
+            subtasks = getSubtasksByAssignmentId(id),
+            color = assignmentColor
         )
 
         cursor.close()
