@@ -1,7 +1,5 @@
 package com.example.flowstate.features
 
-//package com.example.flowstate.features
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -13,81 +11,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.flowstate.features.add.AssignmentAddViewModel
-
-//enhance:
-//different random colour per course code
-//validation not working properly
-/*
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AssignmentAddScreen(
-    navController: NavController,
-    viewModel: AssignmentAddViewModel
-) {
-    //val viewModel = remember { AssignmentAddViewModel(dbHelper) }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Add Assignment") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }
-    ) { inner ->
-        Column(
-            modifier = Modifier
-                .padding(inner)
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-
-            OutlinedTextField(
-                value = viewModel.title.value,
-                onValueChange = { viewModel.title.value = it },
-                label = { Text("Title") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            OutlinedTextField(
-                value = viewModel.courseId.value,
-                onValueChange = { viewModel.courseId.value = it },
-                label = { Text("Course ID") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            OutlinedTextField(
-                value = viewModel.notes.value,
-                onValueChange = { viewModel.notes.value = it },
-                label = { Text("Notes") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(20.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                OutlinedButton(onClick = { navController.popBackStack() }) {
-                    Text("Cancel")
-                }
-
-                Button(onClick = {
-                    viewModel.saveAssignment()
-                    navController.popBackStack()
-                }) {
-                    Text("Add")
-                }
-            }
-        }
-    }
-}
-*/
+import androidx.compose.ui.res.stringResource
+import com.example.flowstate.R
 
 @Composable
 fun AssignmentAddScreen(
@@ -111,7 +36,7 @@ fun AssignmentAddScreen(
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back")
             }
             Text(
-                text = "Add Assignment",
+                text = stringResource(id = R.string.AssignmentAdd_title),
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(start = 8.dp)
             )
@@ -122,7 +47,7 @@ fun AssignmentAddScreen(
         OutlinedTextField(
             value = viewModel.title.value,
             onValueChange = { viewModel.title.value = it },
-            label = { Text("Title") },
+            label = { Text(stringResource(id = R.string.label_title)) },
             modifier = Modifier.fillMaxWidth()
         )
 

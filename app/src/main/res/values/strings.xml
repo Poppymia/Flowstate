@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Flowstate</string>
+
+    //AssignmentsListScreen
+    <string name="AssignmentListItem_title">My Assignments</string>
+
+    //AssignmentsAddScreen
+    <string name="AssignmentAdd_title">Add Assignment</string>
+    <string name="label_title">Title</string>
+    <string name="label_course_id">Course ID</string>
+    <string name="label_priority">Priority</string>
 </resources>
