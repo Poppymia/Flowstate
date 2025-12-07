@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -19,6 +20,7 @@ import com.example.flowstate.Components.AssignmentCard
 import com.example.flowstate.Components.DateChip
 import com.example.flowstate.data.FlowstateDatabaseHelper
 import com.example.flowstate.models.Assignment
+import com.example.flowstate.R
 import com.example.flowstate.navigation.Screen
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,7 +31,6 @@ fun DashboardScreen(
     dbHelper: FlowstateDatabaseHelper,
     modifier: Modifier = Modifier
 ) {
-    // Load assignments once
     val assignments = remember { dbHelper.getAllAssignments() }
 
     DashboardContent(
@@ -78,14 +79,14 @@ fun DashboardContent(
         // Greeting
         Column {
             Text(
-                text = "Good ${getTimeOfDay()}, Bob",
+                text = stringResource(R.string.greeting, getTimeOfDay(), "Bob"),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
             )
             Text(
-                text = "The best way to get started is to quit talking and begin doing",
+                text = stringResource(R.string.dashboard_quote),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = Color.DarkGray
                 )
@@ -109,7 +110,7 @@ fun DashboardContent(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Upcoming / Recent / Activity",
+            text = stringResource(R.string.upcoming_recent_activity),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
                 color = Color.Black
@@ -118,7 +119,7 @@ fun DashboardContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ASSIGNMENT LIST
+        // ASSIGNMENTS LIST
         LazyColumn(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -127,7 +128,6 @@ fun DashboardContent(
                 AssignmentCard(
                     assignment = assignment,
                     onClick = {
-                        //navigate to assignment card
                         navController.navigate("details/${assignment.id}")
                     }
                 )
@@ -140,7 +140,7 @@ fun DashboardContent(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            "No upcoming assignments",
+                            stringResource(R.string.no_upcoming_assignments),
                             color = Color.Gray
                         )
                     }
@@ -155,12 +155,15 @@ fun DashboardContent(
         ) {
             /*FloatingActionButton(
                 onClick = {
-                    // navigate to add assignment screen
                     navController.navigate("AssignmentDetailsScreen")
                 },
                 containerColor = Color(0xFFFBDE98),
                 modifier = Modifier.padding(16.dp)
             ) {
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = stringResource(R.string.add_assignment)
+                )
                 Icon(Icons.Default.Add, contentDescription = "Add Assignment", tint = Color.Black)
             }*/
             FloatingActionButton(
