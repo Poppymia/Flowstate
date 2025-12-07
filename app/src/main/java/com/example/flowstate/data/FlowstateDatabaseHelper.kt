@@ -154,11 +154,8 @@ override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
                     actualGrade = actualGrade,
                     subtasks = subtasks,
                     isCompleted = isCompleted,
-                    color = Color(
-                        red = (100..255).random(),
-                        green = (100..255).random(),
-                        blue = (100..255).random()
-                    )
+                    color = Color(0xFFFBDE98)
+
                 )
             )
         }

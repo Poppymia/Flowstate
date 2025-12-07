@@ -35,6 +35,8 @@ import com.example.flowstate.models.AssignmentsListViewModel
 // Sealed class for type-safe navigation routes
 sealed class Screen(val route: String) {
     object Dashboard : Screen("dashboard")
+    object Splash : Screen("splash")
+
     object Calendar : Screen("calendar")
     object Assignments : Screen("assignments")
     object Profile : Screen("profile")
@@ -166,9 +168,13 @@ fun NavigationGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Dashboard.route,
+        startDestination = Screen.Splash.route,
         modifier = modifier
     ) {
+        // splash Screen
+        composable(Screen.Splash.route) {
+            SplashScreen(navController = navController)
+        }
         // Dashboard Screen
         composable(Screen.Dashboard.route) {
             DashboardScreen(
