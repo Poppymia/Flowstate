@@ -19,6 +19,7 @@ import com.example.flowstate.Components.AssignmentCard
 import com.example.flowstate.Components.DateChip
 import com.example.flowstate.data.FlowstateDatabaseHelper
 import com.example.flowstate.models.Assignment
+import com.example.flowstate.navigation.Screen
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -152,7 +153,7 @@ fun DashboardContent(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.BottomEnd
         ) {
-            FloatingActionButton(
+            /*FloatingActionButton(
                 onClick = {
                     // navigate to add assignment screen
                     navController.navigate("AssignmentDetailsScreen")
@@ -161,7 +162,17 @@ fun DashboardContent(
                 modifier = Modifier.padding(16.dp)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add Assignment", tint = Color.Black)
+            }*/
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate(Screen.AssignmentAdd.route)
+                },
+                containerColor = Color(0xFFFBDE98),
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Assignment", tint = Color.Black)
             }
+
         }
     }
 }

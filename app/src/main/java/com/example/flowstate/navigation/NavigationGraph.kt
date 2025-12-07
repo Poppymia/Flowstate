@@ -28,6 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.flowstate.data.FlowstateDatabaseHelper
 import com.example.flowstate.features.*
+import com.example.flowstate.features.add.AssignmentAddViewModel
 import com.example.flowstate.models.AssignmentsListViewModel
 
 // Sealed class for type-safe navigation routes
@@ -42,6 +43,8 @@ sealed class Screen(val route: String) {
     object AssignmentEdit : Screen("edit/{assignmentId}") {
         fun createRoute(assignmentId: String) = "edit/$assignmentId"
     }
+
+    object AssignmentAdd : Screen("add")
 }
 
 // Bottom navigation item data class
@@ -180,7 +183,7 @@ fun NavigationGraph(
 
         // Assignments List Screen
         composable(Screen.Assignments.route) {
-            AssignmentsListScreen(viewModel = assignmentsListViewModel)
+            AssignmentsListScreen(viewModel = assignmentsListViewModel, navController = navController)
         }
 
         // Profile Screen
@@ -211,6 +214,18 @@ fun NavigationGraph(
                 assignmentId = assignmentId,
                 navController = navController,
                 dbHelper = dbHelper
+            )
+        }
+
+        // Assignment Add Screen
+        composable(
+            route = Screen.AssignmentAdd.route
+        ) {
+            val viewModel = AssignmentAddViewModel(dbHelper)
+
+            AssignmentAddScreen(
+                navController = navController,
+                viewModel = viewModel
             )
         }
     }

@@ -5,11 +5,13 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.example.flowstate.models.Assignment
 import com.example.flowstate.models.Subtask
 
+//changed version to 2 from 1 for testing the colour var
 class FlowstateDatabaseHelper(context: Context) :
-    SQLiteOpenHelper(context, "flowstate.db", null, 1) {
+    SQLiteOpenHelper(context, "flowstate.db", null, 2) {
 
     override fun onCreate(db: SQLiteDatabase?) {
         db?.execSQL("""
@@ -62,6 +64,7 @@ class FlowstateDatabaseHelper(context: Context) :
             put("expectedGrade", a.expectedGrade)
             put("actualGrade", a.actualGrade)
             put("isCompleted", if (a.isCompleted) 1 else 0)
+            put("colorHex", "#${Integer.toHexString(a.color.toArgb()).uppercase()}")
         }
         db.insert("assignments", null, values)
 
@@ -90,6 +93,8 @@ class FlowstateDatabaseHelper(context: Context) :
             val expectedGrade = cursor.getInt(8)
             val actualGrade = cursor.getInt(9)
             val isCompleted = cursor.getInt(10) == 1
+            val colorHex = cursor.getString(cursor.getColumnIndexOrThrow("colorHex"))
+            val color = Color(android.graphics.Color.parseColor(colorHex))
 
             //
             val subtasks = getSubtasksForAssignment(id)
@@ -108,11 +113,7 @@ class FlowstateDatabaseHelper(context: Context) :
                     actualGrade = actualGrade,
                     subtasks = subtasks,
                     isCompleted = isCompleted,
-                    color = Color(
-                        red = (100..255).random(),
-                        green = (100..255).random(),
-                        blue = (100..255).random()
-                    )
+                    color = color
                 )
             )
         }
