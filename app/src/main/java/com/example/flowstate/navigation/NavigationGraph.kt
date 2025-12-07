@@ -13,6 +13,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -28,6 +29,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.flowstate.data.FlowstateDatabaseHelper
 import com.example.flowstate.features.*
+import com.example.flowstate.features.add.AssignmentAddViewModel
 import com.example.flowstate.models.AssignmentsListViewModel
 
 // Sealed class for type-safe navigation routes
@@ -44,6 +46,8 @@ sealed class Screen(val route: String) {
     object AssignmentEdit : Screen("edit/{assignmentId}") {
         fun createRoute(assignmentId: String) = "edit/$assignmentId"
     }
+
+    object AssignmentAdd : Screen("add")
 }
 
 // Bottom navigation item data class
@@ -186,12 +190,15 @@ fun NavigationGraph(
 
         // Assignments List Screen
         composable(Screen.Assignments.route) {
-            AssignmentsListScreen(viewModel = assignmentsListViewModel)
+            AssignmentsListScreen(viewModel = assignmentsListViewModel, navController = navController)
         }
 
-        // Profile Screen
+        // Profile Screen - NOW WITH DATABASE HELPER
         composable(Screen.Profile.route) {
-            ProfileScreen(navController = navController)
+            ProfileScreen(
+                navController = navController,
+                dbHelper = dbHelper
+            )
         }
 
         // Assignment Details Screen
@@ -217,6 +224,16 @@ fun NavigationGraph(
                 assignmentId = assignmentId,
                 navController = navController,
                 dbHelper = dbHelper
+            )
+        }
+
+        // Assignment Add Screen
+        composable(Screen.AssignmentAdd.route) {
+            val addViewModel = remember { AssignmentAddViewModel(dbHelper) }
+
+            AssignmentAddScreen(
+                navController = navController,
+                viewModel = addViewModel
             )
         }
     }

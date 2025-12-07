@@ -2,6 +2,7 @@ package com.example.flowstate.models
 
 import android.content.ContentValues
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.example.flowstate.data.FlowstateDatabaseHelper
 
 class AssignmentRepository(private val dbHelper: FlowstateDatabaseHelper) {
@@ -79,6 +80,7 @@ class AssignmentRepository(private val dbHelper: FlowstateDatabaseHelper) {
                 put("priority", assignment.priority)
                 put("notes", assignment.notes)
                 put("dueDate", assignment.dueDate)
+                put("colorHex", "#${Integer.toHexString(assignment.color.toArgb()).uppercase()}")
             }
             db.update("assignments", assignmentValues, "id = ?", arrayOf(assignment.id))
 
@@ -105,8 +107,6 @@ class AssignmentRepository(private val dbHelper: FlowstateDatabaseHelper) {
             db.endTransaction()
         }
     }
-
-
 
     fun toggleSubtask(subtaskId: String, newValue: Boolean) {
         val db = dbHelper.writableDatabase

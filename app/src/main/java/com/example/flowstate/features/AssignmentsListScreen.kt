@@ -6,22 +6,33 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.flowstate.Components.AssignmentCard
 //import com.example.flowstate.viewmodel.AssignmentsListViewModel
 import com.example.flowstate.models.Assignment
+import com.example.flowstate.navigation.Screen
 import java.text.SimpleDateFormat
 import java.util.*
 
-@Composable
-fun AssignmentsListScreen(viewModel: AssignmentsListViewModel) {
 
-    // Collect live assignment list from ViewModel
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AssignmentsListScreen(
+    viewModel: AssignmentsListViewModel,
+    navController: NavController
+) {
     val assignments by viewModel.assignments.collectAsState()
 
-    //read UI filter state
     val selectedFilter by viewModel.selectedFilter
     val selectedCourse by viewModel.selectedCourse
 
@@ -34,44 +45,100 @@ fun AssignmentsListScreen(viewModel: AssignmentsListViewModel) {
             "Pending" -> !a.isCompleted
             "Completed" -> a.isCompleted
             "Overdue" -> a.dueDate < System.currentTimeMillis()
-            "All" -> true
             else -> true
         }
 
-        val matchCourse = when (selectedCourse) {
-            "All Courses" -> true
-            else -> a.courseId == selectedCourse
-        }
+        val matchCourse = if (selectedCourse == "All Courses")
+            true else a.courseId == selectedCourse
 
         matchStatus && matchCourse
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        FilterSection(
-            selectedFilter = selectedFilter,
-            onSelect = { viewModel.setFilter(it) }
-        )
-
-        Spacer(Modifier.height(12.dp))
-
-        CourseDropdown(
-            selectedCourse = selectedCourse,
-            courseList = courseList,
-            onCourseSelected = { viewModel.setCourseFilter(it) }
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        //assignments list
-        LazyColumn {
-            items(filteredAssignments) { assignment ->
-                AssignmentListItem(assignment)
-            }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("My Assignments") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
         }
+
+    ) { innerPadding ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp)
+        ) {
+
+            // Filters
+            FilterSection(
+                selectedFilter = selectedFilter,
+                onSelect = { viewModel.setFilter(it) }
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            // Course dropdown
+            CourseDropdown(
+                selectedCourse = selectedCourse,
+                courseList = courseList,
+                onCourseSelected = { viewModel.setCourseFilter(it) }
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            // Assignment List (scrollable)
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(filteredAssignments) { assignment ->
+                    AssignmentCard(
+                        assignment = assignment,
+                        onClick = {
+                            navController.navigate("details/${assignment.id}")
+                        }
+                    )
+                }
+            }
+
+            // FAB
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.BottomEnd
+            ) {
+                /*FloatingActionButton(
+                    onClick = {
+                        // navigate to add assignment screen
+                        navController.navigate("AssignmentDetailsScreen")
+                    },
+                    containerColor = Color(0xFFFBDE98),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add Assignment", tint = Color.Black)
+                }*/
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigate(Screen.AssignmentAdd.route)
+                    },
+                    containerColor = Color(0xFFFBDE98),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add Assignment", tint = Color.Black)
+                }
+
+            }
+
+        }
+
     }
 }
 
@@ -122,16 +189,21 @@ fun CourseDropdown(
     }
 }
 
+//assignment cards
 @Composable
-fun AssignmentListItem(a: Assignment) {
-
+fun AssignmentListItem(
+    a: Assignment,
+    onClick: () -> Unit
+) {
     val formatter = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
     val formattedDate = formatter.format(Date(a.dueDate))
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp)
+            .clickable { onClick() }     // <-- Tap goes to details
+            .padding(vertical = 4.dp),
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
 

@@ -17,5 +17,4 @@ data class Assignment (
     val subtasks: List<Subtask> = emptyList(),
     val isCompleted: Boolean = false,
     val color: Color = Color(0xFFFBDE98) // user can change the color or it will be default
-
 )
