@@ -1,5 +1,6 @@
 package com.example.flowstate.features
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -11,6 +12,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ArrowBack
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -43,24 +46,26 @@ import androidx.compose.material3.TimePickerDialog
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import com.example.flowstate.models.AssignmentEditViewModel
 import java.util.Calendar
 import java.util.TimeZone
 
 
 import kotlin.text.format
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AssignmentDetailsEditScreen(
     assignmentId: String,
     navController: NavController,
     dbHelper: FlowstateDatabaseHelper
 ) {
-    // Re-use repository and ViewModel to manage state
     val repo = remember { AssignmentRepository(dbHelper) }
-    val viewModel = remember { AssignmentDetailsViewModel(repo, assignmentId) }
+    val viewModel = remember { AssignmentEditViewModel(repo, assignmentId) }
     val assignment = viewModel.assignment ?: return
 
-    // Local state for UI edits, initialized from the ViewModel
+    // Local UI state
     var title by remember { mutableStateOf(assignment.title) }
     var notes by remember { mutableStateOf(assignment.notes ?: "") }
     var selectedCourse by remember { mutableStateOf(assignment.courseId) }
@@ -68,29 +73,66 @@ fun AssignmentDetailsEditScreen(
     var subtasks by remember { mutableStateOf(assignment.subtasks) }
     var dueDate by remember { mutableStateOf(assignment.dueDate) }
 
+    // Validation and dialogs
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showExitDialog by remember { mutableStateOf(false) }
+    var subtaskWeightError by remember { mutableStateOf(false) }
+    var unsavedChanges by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+
+    fun markChanged() { unsavedChanges = true }
+
+    // TOP APP BAR
     Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    // Create an updated assignment object from the local state
-                    val updatedAssignment = assignment.copy(
-                        title = title,
-                        notes = notes,
-                        courseId = selectedCourse,
-                        priority = priority,
-                        subtasks = subtasks,
-                        dueDate = dueDate
-                    )
-                    // Call ViewModel to save changes
-                    viewModel.updateAssignment(updatedAssignment)
-                    // Navigate back to the details screen
-                    navController.popBackStack()
+        topBar = {
+            TopAppBar(
+                title = { Text("Edit Assignment") },
+
+                navigationIcon = {
+                    IconButton(onClick = {
+                        if (unsavedChanges) showExitDialog = true
+                        else navController.popBackStack()
+                    }) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+
+                actions = {
+                    // Save Button
+                    IconButton(onClick = {
+                        val totalWeight = subtasks.sumOf { it.weight }
+                        val hasSubtasks = subtasks.isNotEmpty()
+
+                        // Validate ONLY if subtasks exist
+                        if (hasSubtasks && totalWeight != 100) {
+                            subtaskWeightError = true
+                            return@IconButton
+                        }
+
+                        val updated = assignment.copy(
+                            title = title,
+                            notes = notes,
+                            courseId = selectedCourse,
+                            priority = priority,
+                            subtasks = subtasks,
+                            dueDate = dueDate
+                        )
+
+                        viewModel.save(updated)
+                        Toast.makeText(context, "Changes Saved", Toast.LENGTH_SHORT).show()
+                        navController.popBackStack()
+                    }) {
+                        Icon(Icons.Default.Check, contentDescription = "Save Changes")
+                    }
+
                 }
-            ) {
-                Icon(Icons.Default.Check, contentDescription = "Save Changes")
-            }
-        }
+            )
+        },
+
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -101,25 +143,107 @@ fun AssignmentDetailsEditScreen(
             item {
                 EditableAssignmentCard(
                     title = title,
-                    onTitleChange = { title = it },
+                    onTitleChange = { title = it; markChanged() },
                     notes = notes,
-                    onNotesChange = { notes = it },
+                    onNotesChange = { notes = it; markChanged() },
                     selectedCourse = selectedCourse,
-                    onCourseSelected = { selectedCourse = it },
+                    onCourseSelected = { selectedCourse = it; markChanged() },
                     priority = priority,
-                    onPriorityChange = { priority = it },
+                    onPriorityChange = { priority = it; markChanged() },
                     subtasks = subtasks,
-                    onSubtasksChange = { subtasks = it },
+                    onSubtasksChange = { subtasks = it; markChanged() },
                     dueDate = dueDate,
-                    onDueDateChange = { newDate -> dueDate = newDate },
+                    onDueDateChange = { newDate -> dueDate = newDate; markChanged() },
                     onAddSubtask = {
-                        subtasks = subtasks + Subtask(assignmentId = assignment.id, text = "New Subtask")
+                        subtasks = subtasks + Subtask(
+                            assignmentId = assignment.id,
+                            text = "New Subtask"
+                        )
+                        markChanged()
                     }
                 )
+                Spacer(Modifier.height(24.dp))
+
+                Button(
+                    onClick = { showDeleteDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete assignment")
+                    Spacer(Modifier.width(8.dp))
+                    Text("Delete Assignment")
+                }
+
             }
+
+            // Subtask weight validation message
+            if (subtaskWeightError) {
+                item {
+                    Text(
+                        "Subtask weights must total 100%",
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
+            }
+
+            item { Spacer(Modifier.height(100.dp)) }
         }
     }
+
+    // DELETE DIALOG
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Assignment") },
+            text = { Text("Are you sure? This cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        viewModel.delete()
+                        Toast.makeText(context, "Assignment deleted", Toast.LENGTH_SHORT).show()
+                        navController.popBackStack()
+                        navController.popBackStack()
+                    }
+                ) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    // EXIT WITHOUT SAVING DIALOG
+    if (showExitDialog) {
+        AlertDialog(
+            onDismissRequest = { showExitDialog = false },
+            title = { Text("Discard changes?") },
+            text = { Text("You have unsaved changes. Exit without saving?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showExitDialog = false
+                    navController.popBackStack()
+                }) {
+                    Text("Discard")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExitDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

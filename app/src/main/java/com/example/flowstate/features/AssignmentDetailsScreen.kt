@@ -37,10 +37,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
@@ -58,6 +63,7 @@ import java.util.TimeZone
 
 //TODO: create assignment details edit screen and carry editable composable components over there
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AssignmentDetailsScreen(
     assignmentId: String,
@@ -70,8 +76,27 @@ fun AssignmentDetailsScreen(
 
     // If assignment failed to load (null), show nothing for now (in future sned user error or a default add new assignment screen)
     val assignment = viewModel.assignment ?: return
+    if (assignment == null) {
+        LaunchedEffect(Unit) {
+            navController.popBackStack()
+        }
+        return
+    }
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(assignment.title) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate("edit/$assignmentId") }
@@ -128,14 +153,14 @@ onEditClick: () -> Unit,
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
             )
 
-            Icon(
-                Icons.Default.Edit,
-                contentDescription = "Edit",
-                modifier = Modifier
-                    .size(24.dp)
-                    .padding(4.dp),
-                tint = cs.onSurface
-            )
+//            Icon(
+//                Icons.Default.Edit,
+//                contentDescription = "Edit",
+//                modifier = Modifier
+//                    .size(24.dp)
+//                    .padding(4.dp),
+//                tint = cs.onSurface
+//            )
         }
 
         Spacer(Modifier.height(16.dp))
@@ -158,7 +183,7 @@ onEditClick: () -> Unit,
             Text(
                 text = remember(assignment.dueDate) {
                     val formatter = SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a", Locale.getDefault())
-                    // FIX: Change the TimeZone to EST/EDT
+                    // Change(d) the TimeZone to EST/EDT
                     formatter.timeZone = TimeZone.getTimeZone("America/New_York")
                     formatter.format(Date(assignment.dueDate))
                 },
@@ -168,7 +193,7 @@ onEditClick: () -> Unit,
 
         Spacer(Modifier.height(16.dp))
 
-        // Course + Priority
+        // Course and Priority
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
