@@ -8,23 +8,22 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.flowstate.Components.AssignmentCard
 //import com.example.flowstate.viewmodel.AssignmentsListViewModel
 import com.example.flowstate.models.Assignment
+import com.example.flowstate.navigation.Screen
 import java.text.SimpleDateFormat
 import java.util.*
 
-//need to add:
-//title
-//back button to go to dashboard
-//overlapping cards
-//lazy column for cards
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,6 +68,7 @@ fun AssignmentsListScreen(
                 }
             )
         }
+
     ) { innerPadding ->
 
         Column(
@@ -97,6 +97,7 @@ fun AssignmentsListScreen(
 
             // Assignment List (scrollable)
             LazyColumn(
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(filteredAssignments) { assignment ->
@@ -108,7 +109,36 @@ fun AssignmentsListScreen(
                     )
                 }
             }
+
+            // FAB
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.BottomEnd
+            ) {
+                /*FloatingActionButton(
+                    onClick = {
+                        // navigate to add assignment screen
+                        navController.navigate("AssignmentDetailsScreen")
+                    },
+                    containerColor = Color(0xFFFBDE98),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add Assignment", tint = Color.Black)
+                }*/
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigate(Screen.AssignmentAdd.route)
+                    },
+                    containerColor = Color(0xFFFBDE98),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add Assignment", tint = Color.Black)
+                }
+
+            }
+
         }
+
     }
 }
 

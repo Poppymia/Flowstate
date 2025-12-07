@@ -13,6 +13,7 @@ import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -218,14 +219,12 @@ fun NavigationGraph(
         }
 
         // Assignment Add Screen
-        composable(
-            route = Screen.AssignmentAdd.route
-        ) {
-            val viewModel = AssignmentAddViewModel(dbHelper)
+        composable(Screen.AssignmentAdd.route) {
+            val addViewModel = remember { AssignmentAddViewModel(dbHelper) }
 
             AssignmentAddScreen(
                 navController = navController,
-                viewModel = viewModel
+                viewModel = addViewModel
             )
         }
     }
