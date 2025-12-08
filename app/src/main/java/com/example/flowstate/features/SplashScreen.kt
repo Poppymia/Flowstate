@@ -26,6 +26,7 @@ fun SplashScreen(navController: NavController) {
 
     val scale = remember { Animatable(0.7f) }
     val alpha = remember { Animatable(0f) }
+    val colorScheme = MaterialTheme.colorScheme
 
     LaunchedEffect(Unit) {
 
@@ -52,7 +53,7 @@ fun SplashScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White),
+            .background(colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -71,7 +72,7 @@ fun SplashScreen(navController: NavController) {
             Text(
                 text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineMedium.copy(),
-                color = Color.Black.copy(alpha = alpha.value)
+                color = colorScheme.onBackground.copy(alpha = alpha.value)
             )
         }
     }

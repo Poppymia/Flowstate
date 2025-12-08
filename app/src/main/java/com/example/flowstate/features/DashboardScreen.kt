@@ -46,6 +46,8 @@ fun DashboardContent(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
+    val colorScheme = MaterialTheme.colorScheme
+
     val upcomingAssignments = assignments
         .filter { !it.isCompleted }
         .sortedBy { it.dueDate }
@@ -74,7 +76,7 @@ fun DashboardContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(colorScheme.background)
             .padding(16.dp)
     ) {
 
@@ -86,7 +88,7 @@ fun DashboardContent(
                 text = stringResource(R.string.greeting, getTimeOfDay(), "Bob"),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = colorScheme.onBackground
                 )
             )
             Text(
@@ -124,7 +126,7 @@ fun DashboardContent(
             text = stringResource(R.string.upcoming_recent_activity),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = colorScheme.onBackground
             )
         )
 
@@ -164,19 +166,7 @@ fun DashboardContent(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.BottomEnd
         ) {
-            /*FloatingActionButton(
-                onClick = {
-                    navController.navigate("AssignmentDetailsScreen")
-                },
-                containerColor = Color(0xFFFBDE98),
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_assignment)
-                )
-                Icon(Icons.Default.Add, contentDescription = "Add Assignment", tint = Color.Black)
-            }*/
+
             FloatingActionButton(
                 onClick = {
                     navController.navigate(Screen.AssignmentAdd.route)
