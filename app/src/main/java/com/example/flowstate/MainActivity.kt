@@ -11,7 +11,6 @@ import com.example.flowstate.navigation.FlowstateApp
 import com.example.flowstate.ui.theme.FlowstateTheme
 
 class MainActivity : ComponentActivity() {
-
     private lateinit var assignmentsListViewModel: AssignmentsListViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,12 +44,13 @@ class MainActivity : ComponentActivity() {
 
     private fun seedSampleAssignments(dbHelper: FlowstateDatabaseHelper) {
         val sampleId = "test-assignment-1"
+        val now = System.currentTimeMillis()
 
         dbHelper.insertAssignment(
             id = sampleId,
             title = "PROG3211 Final Project",
             courseId = "PROG3211",
-            dueDate = System.currentTimeMillis() + (86400000 * 3), // +3 days
+            dueDate = System.currentTimeMillis() + (86400000 * 3),
             priority = 2,
             progress = 0,
             notes = "Start working on UI & database"
@@ -59,6 +59,58 @@ class MainActivity : ComponentActivity() {
         dbHelper.insertSubtask("st-1", sampleId, "Design UI screens", false)
         dbHelper.insertSubtask("st-2", sampleId, "Implement local DB", false)
         dbHelper.insertSubtask("st-3", sampleId, "Test navigation", false)
+
+        dbHelper.insertAssignment(
+            id = "overdue-1",
+            title = "PROG5542 Lab Report",
+            courseId = "PROG5542",
+            dueDate = now - (86400000L * 3),
+            priority = 1,
+            progress = 40,
+            notes = "Need to finish analysis section"
+        )
+
+        dbHelper.insertAssignment(
+            id = "overdue-2",
+            title = "PROG3211 API Integration Demo",
+            courseId = "PROG3211",
+            dueDate = now - (86400000L * 7),
+            priority = 2,
+            progress = 10,
+            notes = "Forgot to connect ViewModel"
+        )
+
+        val completed1 = com.example.flowstate.models.Assignment(
+            id = "completed-1",
+            title = "PROG5542 Midterm Review",
+            courseId = "PROG5542",
+            dueDate = now - (86400000L * 10),
+            priority = 3,
+            progress = 100,
+            notes = "Everything submitted",
+            estimatedTimeMinutes = 0,
+            expectedGrade = 0,
+            actualGrade = 0,
+            subtasks = emptyList(),
+            isCompleted = true
+        )
+        dbHelper.insertAssignment(completed1)
+
+        val completed2 = com.example.flowstate.models.Assignment(
+            id = "completed-2",
+            title = "PROG3211 UI Prototype",
+            courseId = "PROG3211",
+            dueDate = now - (86400000L * 5),
+            priority = 1,
+            progress = 100,
+            notes = "Approved by prof",
+            estimatedTimeMinutes = 0,
+            expectedGrade = 0,
+            actualGrade = 0,
+            subtasks = emptyList(),
+            isCompleted = true
+        )
+        dbHelper.insertAssignment(completed2)
     }
 
     private fun seedSampleCourses(dbHelper: FlowstateDatabaseHelper) {

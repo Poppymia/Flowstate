@@ -27,13 +27,12 @@ fun AssignmentAddScreen(
             .padding(16.dp)
     ) {
 
-        // Top Row: Back + Title
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                Icon(Icons.Default.ArrowBack, contentDescription = (stringResource(id = R.string.back)))
             }
             Text(
                 text = stringResource(id = R.string.AssignmentAdd_title),
@@ -83,7 +82,7 @@ fun AssignmentAddScreen(
         )
         Spacer(Modifier.height(16.dp))
 
-        // Error Message
+        //error message
         if (error != null) {
             Text(
                 text = error,
@@ -94,7 +93,7 @@ fun AssignmentAddScreen(
         }
         Spacer(Modifier.weight(1f))
 
-        // Buttons
+        //buttons for save and cancel
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()

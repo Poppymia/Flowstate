@@ -47,6 +47,11 @@
     <string name="priority_label">Priority:</string>
     <string name="notes_label">Notes:</string>
     <string name="no_notes_added">No notes added.</string>
+    <string name="filter_pending">Pending</string>
+    <string name="filter_completed">Completed</string>
+    <string name="filter_overdue">Overdue</string>
+    <string name="filter_all">All</string>
+    <string name="all_courses">All Courses</string>
 
     <string-array name="course_list">
         <item>Programming</item>

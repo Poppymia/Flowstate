@@ -37,19 +37,19 @@ fun AssignmentsListScreen(
     val selectedFilter by viewModel.selectedFilter
     val selectedCourse by viewModel.selectedCourse
 
-    val courseList = listOf("All Courses") +
+    val courseList = listOf(stringResource(id = R.string.all_courses)) +
             assignments.map { it.courseId }.distinct()
 
     val filteredAssignments = assignments.filter { a ->
 
         val matchStatus = when (selectedFilter) {
-            "Pending" -> !a.isCompleted
-            "Completed" -> a.isCompleted
-            "Overdue" -> a.dueDate < System.currentTimeMillis()
+            (stringResource(id = R.string.filter_pending)) -> !a.isCompleted
+            (stringResource(id = R.string.filter_completed)) -> a.isCompleted
+            (stringResource(id = R.string.filter_overdue)) -> a.dueDate < System.currentTimeMillis()
             else -> true
         }
 
-        val matchCourse = if (selectedCourse == "All Courses")
+        val matchCourse = if (selectedCourse == (stringResource(id = R.string.all_courses)) )
             true else a.courseId == selectedCourse
 
         matchStatus && matchCourse
@@ -63,7 +63,7 @@ fun AssignmentsListScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = (stringResource(id = R.string.back))
                         )
                     }
                 }
@@ -111,7 +111,7 @@ fun AssignmentsListScreen(
                 }
             }
 
-            // FAB
+            //FAB
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomEnd
@@ -123,19 +123,16 @@ fun AssignmentsListScreen(
                     containerColor = Color(0xFFFBDE98),
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Assignment", tint = Color.Black)
+                    Icon(Icons.Default.Add, contentDescription = (stringResource(id = R.string.add_assignment)), tint = Color.Black)
                 }
-
             }
-
         }
-
     }
 }
 
 @Composable
 fun FilterSection(selectedFilter: String, onSelect: (String) -> Unit) {
-    val filters = listOf("All", "Pending", "Completed", "Overdue")
+    val filters = listOf((stringResource(id = R.string.filter_all)), (stringResource(id = R.string.filter_pending)), (stringResource(id = R.string.filter_completed)), (stringResource(id = R.string.filter_overdue)))
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp)

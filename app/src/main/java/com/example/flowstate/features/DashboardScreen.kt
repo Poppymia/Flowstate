@@ -98,6 +98,7 @@ fun DashboardContent(
                 )
             )
 
+            //api call for quote
             if (author.isNotEmpty()) {
                 Text(
                     text = "- $author",

@@ -35,8 +35,6 @@ fun AssignmentCard(
     assignment: Assignment,
     onClick: () -> Unit
 ) {
-
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -99,7 +97,6 @@ fun AssignmentCard(
         }
     }
 }
-
 
 private fun formatDueDate(timestamp: Long): String {
     val formatter = SimpleDateFormat("MMM dd", Locale.getDefault())
