@@ -1,5 +1,13 @@
 <resources>
     <string name="app_name">Flowstate</string>
+
+    <string name="AssignmentListItem_title">My Assignments</string>
+    <string name="AssignmentAdd_title">Add Assignment</string>
+    <string name="label_title">Title</string>
+    <string name="label_course_id">Course ID</string>
+    <string name="label_notes">Notes (optional)</string>
+    <string name="label_estimated_minutes">Estimated Minutes (optional)</string>
+    <string name="label_expected_grade">Expected Grade (optional)</string>
     <string name="back">Back</string>
     <string name="edit_assignment">Edit Assignment</string>
     <string name="changes_saved">Changes Saved</string>
@@ -10,6 +18,7 @@
     <string name="are_you_sure_this_cannot_be_undone">Are you sure? This cannot be undone.</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
     <string name="discard_changes">Discard changes?</string>
     <string name="you_have_unsaved_changes_exit_without_saving">You have unsaved changes. Exit without saving?</string>
     <string name="discard">Discard</string>
@@ -59,5 +68,4 @@
         <string name="add_assignment">Add Assignment</string>
         <string name="app_logo">Flowstate Logo</string>
     <string name="assignment_due_label">Due:</string>
-
 </resources>

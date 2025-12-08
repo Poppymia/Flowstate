@@ -69,6 +69,10 @@ fun DashboardContent(
         dates
     }
 
+    val quoteViewModel = remember { com.example.flowstate.models.QuoteViewModel() }
+    val quote = quoteViewModel.quote.value
+    val author = quoteViewModel.author.value
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -88,13 +92,21 @@ fun DashboardContent(
                 )
             )
             Text(
-                text = stringResource(R.string.dashboard_quote),
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = colorScheme.onSurfaceVariant
+                text = quote,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = Color.DarkGray
                 )
             )
-        }
 
+            if (author.isNotEmpty()) {
+                Text(
+                    text = "- $author",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = Color.Gray
+                    )
+                )
+            }
+        }
         Spacer(modifier = Modifier.height(24.dp))
 
         // WEEK ROW
@@ -108,7 +120,6 @@ fun DashboardContent(
                 )
             }
         }
-
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(

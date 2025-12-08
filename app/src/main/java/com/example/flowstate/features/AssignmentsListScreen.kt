@@ -23,7 +23,8 @@ import com.example.flowstate.models.Assignment
 import com.example.flowstate.navigation.Screen
 import java.text.SimpleDateFormat
 import java.util.*
-
+import androidx.compose.ui.res.stringResource
+import com.example.flowstate.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +58,7 @@ fun AssignmentsListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("My Assignments") },
+                title = { Text(stringResource(id = R.string.AssignmentListItem_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -115,16 +116,6 @@ fun AssignmentsListScreen(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomEnd
             ) {
-                /*FloatingActionButton(
-                    onClick = {
-                        // navigate to add assignment screen
-                        navController.navigate("AssignmentDetailsScreen")
-                    },
-                    containerColor = Color(0xFFFBDE98),
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Assignment", tint = Color.Black)
-                }*/
                 FloatingActionButton(
                     onClick = {
                         navController.navigate(Screen.AssignmentAdd.route)
@@ -185,34 +176,6 @@ fun CourseDropdown(
                     }
                 )
             }
-        }
-    }
-}
-
-//assignment cards
-@Composable
-fun AssignmentListItem(
-    a: Assignment,
-    onClick: () -> Unit
-) {
-    val formatter = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-    val formattedDate = formatter.format(Date(a.dueDate))
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }     // <-- Tap goes to details
-            .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column(Modifier.padding(16.dp)) {
-
-            Text(text = a.title, style = MaterialTheme.typography.titleMedium)
-
-            Spacer(Modifier.height(4.dp))
-
-            Text("Course: ${a.courseId}", style = MaterialTheme.typography.bodyMedium)
-            Text("Due: $formattedDate", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
