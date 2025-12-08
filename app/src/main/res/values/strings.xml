@@ -2,6 +2,7 @@
     <string name="app_name">Flowstate</string>
 
     <string name="AssignmentListItem_title">My Assignments</string>
+    <string name="user_Name">Bob</string>
     <string name="AssignmentAdd_title">Add Assignment</string>
     <string name="label_title">Title</string>
     <string name="label_course_id">Course ID</string>
@@ -67,10 +68,14 @@
     </string-array>
 
         <string name="greeting">Good %1$s, %2$s</string>
-        <string name="dashboard_quote">The best way to get started is to quit talking and begin doing</string>
         <string name="upcoming_recent_activity">Upcoming / Recent / Activity</string>
         <string name="no_upcoming_assignments">No upcoming assignments</string>
         <string name="add_assignment">Add Assignment</string>
         <string name="app_logo">Flowstate Logo</string>
     <string name="assignment_due_label">Due:</string>
+
+    <string name="morning">Morning</string>
+    <string name="afternoon">Afternoon</string>
+    <string name="evening">Evening</string>
+
 </resources>
