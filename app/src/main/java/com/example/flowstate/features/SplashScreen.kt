@@ -24,12 +24,19 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreen(navController: NavController) {
 
+    // the logo scale starts from smaller and grows to 1f after animation.
     val scale = remember { Animatable(0.7f) }
+
+    // controls fade-in effect  for both logo and text
     val alpha = remember { Animatable(0f) }
+
+    // to support both light and dark mode
     val colorScheme = MaterialTheme.colorScheme
 
+    // this helps run animations and delays
     LaunchedEffect(Unit) {
 
+        // logo grows smoothly from 70 % to 100 %
         scale.animateTo(
             targetValue = 1f,
             animationSpec = tween(
@@ -38,13 +45,15 @@ fun SplashScreen(navController: NavController) {
             )
         )
 
+        // logo and name appear gradually
         alpha.animateTo(
             targetValue = 1f,
             animationSpec = tween(durationMillis = 600)
         )
 
-        delay(1500)
+        delay(1500) // pauses
 
+        // navigate to dashboard after animation is done
         navController.navigate("dashboard") {
             popUpTo("splash") { inclusive = true }
         }
@@ -58,13 +67,14 @@ fun SplashScreen(navController: NavController) {
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
+            // app logo
             Image(
                 painter = painterResource(id = R.drawable.flowstate),
                 contentDescription = stringResource(id = R.string.app_logo),
                 modifier = Modifier
                     .size(180.dp)
-                    .scale(scale.value)
-                    .alpha(alpha.value)
+                    .scale(scale.value) // logo grows
+                    .alpha(alpha.value) // logo fades in
             )
 
             Spacer(modifier = Modifier.height(16.dp))

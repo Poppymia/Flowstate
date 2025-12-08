@@ -35,12 +35,11 @@ fun AssignmentCard(
     assignment: Assignment,
     onClick: () -> Unit
 ) {
-
-
+    // displays assignment details
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick), // tappable card
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = assignment.color
@@ -50,6 +49,7 @@ fun AssignmentCard(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            // due date
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -64,6 +64,7 @@ fun AssignmentCard(
                         )
                     )
 
+                    // due date formatted
                     Text(
                         text = formatDueDate(assignment.dueDate),
                         style = MaterialTheme.typography.bodyMedium.copy(
@@ -76,18 +77,20 @@ fun AssignmentCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // assignment title
             Text(
                 text = assignment.title,
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 ),
-                maxLines = 2,
+                maxLines = 2, // prevents overflow
                 overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
+            // course code
             Text(
                 text = assignment.courseId,
                 style = MaterialTheme.typography.bodySmall.copy(
@@ -100,7 +103,7 @@ fun AssignmentCard(
     }
 }
 
-
+// formats due date to show month and date
 private fun formatDueDate(timestamp: Long): String {
     val formatter = SimpleDateFormat("MMM dd", Locale.getDefault())
     return formatter.format(Date(timestamp))

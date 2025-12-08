@@ -24,16 +24,20 @@ fun DateChip(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+
+    //  background color and content color based on selection
     val backgroundColor = when {
         isSelected -> Color(0xFFEC4899) // Pink
         else -> MaterialTheme.colorScheme.surfaceVariant
     }
 
+    // color changes based on selection
     val contentColor = when {
         isSelected -> Color.White
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
+    // chip container
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
@@ -42,6 +46,7 @@ fun DateChip(
             .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // date
         Text(
             text = day.toString(),
             style = MaterialTheme.typography.titleMedium.copy(
@@ -52,6 +57,7 @@ fun DateChip(
 
         Spacer(modifier = Modifier.height(4.dp))
 
+        // day name
         Text(
             text = dayName,
             style = MaterialTheme.typography.bodySmall.copy(

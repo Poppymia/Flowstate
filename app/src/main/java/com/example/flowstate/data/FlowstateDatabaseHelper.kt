@@ -31,6 +31,7 @@ class FlowstateDatabaseHelper(context: Context) :
 
         """)
 
+            // assignment cards get the data from here as well
         db?.execSQL("""
             CREATE TABLE subtasks (
                 id TEXT PRIMARY KEY,
@@ -119,6 +120,8 @@ override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         //db.close()
     }
 
+
+    // dashboard screen get assignments from here
     fun getAllAssignments(): List<Assignment> {
         val db = readableDatabase
         val cursor = db.rawQuery("SELECT * FROM assignments", null)
@@ -140,6 +143,7 @@ override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
             val color = Color(android.graphics.Color.parseColor(colorHex))
             val subtasks = getSubtasksForAssignment(id)
 
+            // final assignment object
             assignments.add(
                 Assignment(
                     id = id,
@@ -165,6 +169,7 @@ override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         return assignments
     }
 
+    // dashboard will update the next time data is reloaded
     fun deleteAssignment(id: String) {
         val db = writableDatabase
         db.delete("assignments", "id=?", arrayOf(id))

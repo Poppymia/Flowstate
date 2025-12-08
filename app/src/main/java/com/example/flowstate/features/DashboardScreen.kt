@@ -31,8 +31,11 @@ fun DashboardScreen(
     dbHelper: FlowstateDatabaseHelper,
     modifier: Modifier = Modifier
 ) {
+
+    // loads all assignments once when the screen composes
     val assignments = remember { dbHelper.getAllAssignments() }
 
+    // passes data to the main dashboard content composable
     DashboardContent(
         assignments = assignments,
         navController = navController,
@@ -48,14 +51,18 @@ fun DashboardContent(
 ) {
     val colorScheme = MaterialTheme.colorScheme
 
+    // shows only incomplete tasks, sorted by due date, limited to the next 5 only
     val upcomingAssignments = assignments
         .filter { !it.isCompleted }
         .sortedBy { it.dueDate }
         .take(5)
 
+    // stores the currently selected day.
+    // defaults to today's date when dashboard loads
     val calendar = Calendar.getInstance()
     val selectedDate = remember { mutableStateOf(calendar.get(Calendar.DAY_OF_MONTH)) }
 
+    // generate the dates for the current week
     val weekDates = remember {
         val dates = mutableListOf<Pair<Int, String>>()
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
@@ -69,6 +76,7 @@ fun DashboardContent(
         dates
     }
 
+    // quote of the day using an API call
     val quoteViewModel = remember { com.example.flowstate.models.QuoteViewModel() }
     val quote = quoteViewModel.quote.value
     val author = quoteViewModel.author.value
@@ -85,16 +93,17 @@ fun DashboardContent(
         // Greeting
         Column {
             Text(
-                text = stringResource(R.string.greeting, getTimeOfDay(), "Bob"),
+                text = stringResource(R.string.greeting, getTimeOfDay(), stringResource(R.string.user_Name)),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = colorScheme.onBackground
                 )
             )
+            // daily motivational quote
             Text(
                 text = quote,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    color = Color.DarkGray
+                    color = colorScheme.onBackground
                 )
             )
 
@@ -102,14 +111,14 @@ fun DashboardContent(
                 Text(
                     text = "- $author",
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        color = Color.Gray
+                        color = colorScheme.onBackground
                     )
                 )
             }
         }
         Spacer(modifier = Modifier.height(24.dp))
 
-        // WEEK ROW
+        // week row using DateChip composable
         LazyRow(horizontalArrangement = Arrangement.spacedBy(26.dp)) {
             items(weekDates) { (day, dayName) ->
                 DateChip(
@@ -122,6 +131,7 @@ fun DashboardContent(
         }
         Spacer(modifier = Modifier.height(32.dp))
 
+        // upcoming or recent activity section
         Text(
             text = stringResource(R.string.upcoming_recent_activity),
             style = MaterialTheme.typography.titleLarge.copy(
@@ -132,7 +142,7 @@ fun DashboardContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ASSIGNMENTS LIST
+        // upcoming assignments list
         LazyColumn(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -141,11 +151,13 @@ fun DashboardContent(
                 AssignmentCard(
                     assignment = assignment,
                     onClick = {
+                        // navigates to assignment details screen using assignment ID
                         navController.navigate("details/${assignment.id}")
                     }
                 )
             }
 
+            // if no upcoming assignments exist, shows empty message
             if (upcomingAssignments.isEmpty()) {
                 item {
                     Box(
@@ -161,7 +173,7 @@ fun DashboardContent(
             }
         }
 
-        // FAB
+        // FAB  to add new assignment
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.BottomEnd
@@ -169,22 +181,25 @@ fun DashboardContent(
 
             FloatingActionButton(
                 onClick = {
+                    // navigates to add assignment screen
                     navController.navigate(Screen.AssignmentAdd.route)
                 },
                 containerColor = Color(0xFFFBDE98),
                 modifier = Modifier.padding(16.dp)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Assignment", tint = Color.Black)
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_assignment), tint = Color.Black)
             }
 
         }
     }
 }
 
-private fun getTimeOfDay(): String {
+// utility function uses to create good morning/ good afternoon/ good evening
+@Composable
+fun getTimeOfDay(): String {
     return when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
-        in 0..11 -> "Morning"
-        in 12..16 -> "Afternoon"
-        else -> "Evening"
+        in 0..11 -> stringResource(R.string.morning)
+        in 12..16 -> stringResource(R.string.afternoon)
+        else -> stringResource(R.string.evening)
     }
 }

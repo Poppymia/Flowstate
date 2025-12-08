@@ -168,7 +168,7 @@ fun NavigationGraph(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Splash.route,
+        startDestination = Screen.Splash.route,  // loads splash screen
         modifier = modifier
     ) {
         // splash Screen
