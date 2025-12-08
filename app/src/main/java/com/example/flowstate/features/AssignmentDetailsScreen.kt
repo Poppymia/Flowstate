@@ -155,9 +155,7 @@ fun AssignmentCard(
             .fillMaxWidth()
     ) {
 
-        // ----------------------------------------------------
         // HEADER — Assignment Title
-        // ----------------------------------------------------
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -171,9 +169,7 @@ fun AssignmentCard(
 
         Spacer(Modifier.height(16.dp))
 
-        // ----------------------------------------------------
         // PROGRESS BAR — reflects completed subtasks
-        // ----------------------------------------------------
         LinearProgressIndicator(
             progress = progress,
             modifier = Modifier
@@ -184,9 +180,7 @@ fun AssignmentCard(
 
         Spacer(Modifier.height(20.dp))
 
-        // ----------------------------------------------------
         // DUE DATE
-        // ----------------------------------------------------
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 Icons.Default.CalendarMonth,
@@ -209,9 +203,7 @@ fun AssignmentCard(
 
         Spacer(Modifier.height(16.dp))
 
-        // ----------------------------------------------------
         // COURSE + PRIORITY LABELS
-        // ----------------------------------------------------
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -233,9 +225,7 @@ fun AssignmentCard(
 
         Spacer(Modifier.height(20.dp))
 
-        // ----------------------------------------------------
         // SUBTASK LIST
-        // ----------------------------------------------------
         assignment.subtasks.forEach { subtask ->
             SubtaskRow(
                 subtask = subtask,
@@ -247,9 +237,8 @@ fun AssignmentCard(
 
         Spacer(Modifier.height(20.dp))
 
-        // ----------------------------------------------------
+
         // NOTES SECTION
-        // ----------------------------------------------------
         Text(
             stringResource(R.string.notes_label),
             style = MaterialTheme.typography.titleMedium
