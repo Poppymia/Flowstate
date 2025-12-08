@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
-class AssignmentDetailsViewModel(
+class AssignmentEditViewModel(
     private val repo: AssignmentRepository,
     private val assignmentId: String
 ) : ViewModel() {
@@ -13,37 +13,26 @@ class AssignmentDetailsViewModel(
     var assignment by mutableStateOf<Assignment?>(null)
         private set
 
-    // subtasks for the UI from the main assignment object
-    var subtasks by mutableStateOf<List<Subtask>>(emptyList())
-
-
     init {
         load()
     }
 
     private fun load() {
         assignment = repo.getAssignment(assignmentId)
-        // Also update the subtasks state when loading
-        subtasks = assignment?.subtasks ?: emptyList()
     }
 
-    fun toggleSubtask(subtask: Subtask) {
-        repo.toggleSubtask(subtask.id, !subtask.isChecked)
-        // refresh from db
+    fun save(updated: Assignment) {
+        repo.updateAssignment(updated)
         load()
     }
 
-    // this was added to new edit vm, this was left here just in case
+    fun delete() {
+        repo.deleteAssignment(assignmentId)
+    }
+
     fun updateAssignment(updatedAssignment: Assignment) {
         repo.updateAssignment(updatedAssignment)
         // after updating, refresh the vm's state from the database to ensure the UI is consistent
         load()
     }
-
-
-    val progress: Float
-        get() = assignment?.subtasks?.count { it.isChecked }?.toFloat().let { checked ->
-            val total = assignment?.subtasks?.size ?: 1
-            checked!! / total
-        }
 }
