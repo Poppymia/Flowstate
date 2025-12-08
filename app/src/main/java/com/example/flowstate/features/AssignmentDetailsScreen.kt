@@ -37,10 +37,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
@@ -51,6 +58,9 @@ import com.example.flowstate.models.Assignment
 import com.example.flowstate.models.AssignmentDetailsViewModel
 import com.example.flowstate.models.AssignmentRepository
 
+import com.example.flowstate.R
+
+
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -58,25 +68,53 @@ import java.util.TimeZone
 
 //TODO: create assignment details edit screen and carry editable composable components over there
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AssignmentDetailsScreen(
     assignmentId: String,
     navController: NavController,
     dbHelper: FlowstateDatabaseHelper
 ) {
-    // create repository and viewmodel
+    // Repository + ViewModel for retrieving assignment details
     val repo = remember { AssignmentRepository(dbHelper) }
     val viewModel = remember { AssignmentDetailsViewModel(repo, assignmentId) }
 
-    // If assignment failed to load (null), show nothing for now (in future sned user error or a default add new assignment screen)
+    // If nothing loads (deleted or invalid ID), return early
     val assignment = viewModel.assignment ?: return
+    if (assignment == null) {
+        LaunchedEffect(Unit) {
+            navController.popBackStack()
+        }
+        return
+    }
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                // Display assignment title
+                title = { Text(assignment.title) },
+
+                // Back navigation
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
+                    }
+                }
+            )
+        },
+
+        // FAB → Go to edit screen
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate("edit/$assignmentId") }
             ) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit Assignment")
+                Icon(
+                    Icons.Default.Edit,
+                    contentDescription = stringResource(R.string.edit_assignment)
+                )
             }
         }
     ) { padding ->
@@ -87,11 +125,12 @@ fun AssignmentDetailsScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
+            // Main UI card showing all assignment info
             AssignmentCard(
                 assignment = assignment,
                 progress = viewModel.progress,
                 onToggleSubtask = { subtask -> viewModel.toggleSubtask(subtask) },
-                readOnly = false,
+                readOnly = false, // Allows toggling subtasks
                 onEditClick = { navController.navigate("edit/$assignmentId") }
             )
         }
@@ -100,12 +139,11 @@ fun AssignmentDetailsScreen(
 
 @Composable
 fun AssignmentCard(
-assignment: Assignment,
-progress: Float,
-onToggleSubtask: (Subtask) -> Unit,
-readOnly: Boolean,
-onEditClick: () -> Unit,
-
+    assignment: Assignment,
+    progress: Float,
+    onToggleSubtask: (Subtask) -> Unit,
+    readOnly: Boolean,
+    onEditClick: () -> Unit
 ) {
     val cs = MaterialTheme.colorScheme
 
@@ -117,30 +155,25 @@ onEditClick: () -> Unit,
             .fillMaxWidth()
     ) {
 
-        // Header
+        // ----------------------------------------------------
+        // HEADER — Assignment Title
+        // ----------------------------------------------------
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                assignment.title,
+                text = assignment.title,
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-            )
-
-            Icon(
-                Icons.Default.Edit,
-                contentDescription = "Edit",
-                modifier = Modifier
-                    .size(24.dp)
-                    .padding(4.dp),
-                tint = cs.onSurface
             )
         }
 
         Spacer(Modifier.height(16.dp))
 
-        // Progress
+        // ----------------------------------------------------
+        // PROGRESS BAR — reflects completed subtasks
+        // ----------------------------------------------------
         LinearProgressIndicator(
             progress = progress,
             modifier = Modifier
@@ -151,40 +184,58 @@ onEditClick: () -> Unit,
 
         Spacer(Modifier.height(20.dp))
 
-        // Date
+        // ----------------------------------------------------
+        // DUE DATE
+        // ----------------------------------------------------
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.CalendarMonth, contentDescription = null)
+            Icon(
+                Icons.Default.CalendarMonth,
+                contentDescription = stringResource(R.string.due_date)
+            )
             Spacer(Modifier.width(8.dp))
+
+            // Format timestamp into readable date
+            val formattedDate = remember(assignment.dueDate) {
+                val formatter = SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a", Locale.getDefault())
+                formatter.timeZone = TimeZone.getTimeZone("America/New_York")
+                formatter.format(Date(assignment.dueDate))
+            }
+
             Text(
-                text = remember(assignment.dueDate) {
-                    val formatter = SimpleDateFormat("MMM dd, yyyy 'at' hh:mm a", Locale.getDefault())
-                    // FIX: Change the TimeZone to EST/EDT
-                    formatter.timeZone = TimeZone.getTimeZone("America/New_York")
-                    formatter.format(Date(assignment.dueDate))
-                },
+                text = formattedDate,
                 style = MaterialTheme.typography.bodyLarge
             )
         }
 
         Spacer(Modifier.height(16.dp))
 
-        // Course + Priority
+        // ----------------------------------------------------
+        // COURSE + PRIORITY LABELS
+        // ----------------------------------------------------
         Row(
             Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("Course: ${assignment.courseId}")
-            PriorityChip(label = when (assignment.priority) {
-                0 -> "low"
-                1 -> "medium"
-                2 -> "high"
-                else -> "unknown"
-            })
+            // Course label
+            Text("${stringResource(R.string.course_label)} ${assignment.courseId}")
+
+            // Load the priority names from string resources
+            val priorityNames = stringArrayResource(id = R.array.priority_levels)
+
+            // Safely map numeric priority → label (Low, Medium, High)
+            val priorityLabel = priorityNames.getOrElse(assignment.priority) {
+                stringResource(R.string.unknown)
+            }
+
+
+            PriorityChip(label = priorityLabel)
         }
 
         Spacer(Modifier.height(20.dp))
 
-        // Subtasks
+        // ----------------------------------------------------
+        // SUBTASK LIST
+        // ----------------------------------------------------
         assignment.subtasks.forEach { subtask ->
             SubtaskRow(
                 subtask = subtask,
@@ -196,9 +247,11 @@ onEditClick: () -> Unit,
 
         Spacer(Modifier.height(20.dp))
 
-        // Notes
+        // ----------------------------------------------------
+        // NOTES SECTION
+        // ----------------------------------------------------
         Text(
-            "Notes:",
+            stringResource(R.string.notes_label),
             style = MaterialTheme.typography.titleMedium
         )
 
@@ -212,12 +265,14 @@ onEditClick: () -> Unit,
                 .padding(16.dp)
         ) {
             Text(
-                assignment.notes ?: "No notes added.",
+                // If no notes exist, show fallback string
+                assignment.notes ?: stringResource(R.string.no_notes_added),
                 color = Color.Gray
             )
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

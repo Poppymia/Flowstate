@@ -1,4 +1,56 @@
 <resources>
+    <string name="app_name">Flowstate</string>
+    <string name="back">Back</string>
+    <string name="edit_assignment">Edit Assignment</string>
+    <string name="changes_saved">Changes Saved</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="new_subtask">New Subtask</string>
+    <string name="delete_assignment">Delete Assignment</string>
+    <string name="subtask_weights_must_total_100">Subtask weights must total 100%</string>
+    <string name="are_you_sure_this_cannot_be_undone">Are you sure? This cannot be undone.</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="discard_changes">Discard changes?</string>
+    <string name="you_have_unsaved_changes_exit_without_saving">You have unsaved changes. Exit without saving?</string>
+    <string name="discard">Discard</string>
+    <string name="assignment_title">Assignment Title</string>
+    <string name="change_due_date">Change due date</string>
+    <string name="ok">OK</string>
+    <string name="subtasks">Subtasks</string>
+    <string name="add_subtask">Add Subtask</string>
+    <string name="attachments">Attachments</string>
+    <string name="add_attachment">Add Attachment</string>
+    <string name="notes">Notes</string>
+    <string name="add_your_notes_here">Add your notes here...</string>
+    <string name="select_due_time">Select Due Time</string>
+    <string name="subtask_name">Subtask Name</string>
+    <string name="wgt">Wgt %</string>
+    <string name="delete_subtask">Delete Subtask</string>
+    <string name="_0">0</string>
+    <string name="course">Course</string>
+    <string name="add_new_course">Add New Course...</string>
+    <string name="unknown">Unknown</string>
+    <string name="priority">Priority</string>
+    <string name="edit">Edit</string>
+    <string name="progress">Progress</string>
+    <string name="due_date">Due Date</string>
+    <string name="course_label">Course:</string>
+    <string name="priority_label">Priority:</string>
+    <string name="notes_label">Notes:</string>
+    <string name="no_notes_added">No notes added.</string>
+
+    <string-array name="course_list">
+        <item>Programming</item>
+        <item>Math</item>
+        <item>Writing</item>
+        <item>Design</item>
+    </string-array>
+
+    <string-array name="priority_levels">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+    </string-array>
         <string name="app_name">Flowstate</string>
         <string name="greeting">Good %1$s, %2$s</string>
         <string name="dashboard_quote">The best way to get started is to quit talking and begin doing</string>

@@ -108,6 +108,17 @@ class AssignmentRepository(private val dbHelper: FlowstateDatabaseHelper) {
         }
     }
 
+    fun deleteAssignment(assignmentId: String) {
+        val db = dbHelper.writableDatabase
+
+        // delete subtasks first (foreign key manual cascade)
+        db.execSQL("DELETE FROM subtasks WHERE assignmentId = ?", arrayOf(assignmentId))
+
+        // delete the assignment itself
+        db.execSQL("DELETE FROM assignments WHERE id = ?", arrayOf(assignmentId))
+    }
+
+
     fun toggleSubtask(subtaskId: String, newValue: Boolean) {
         val db = dbHelper.writableDatabase
 
