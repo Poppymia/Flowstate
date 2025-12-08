@@ -47,6 +47,9 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
+import com.example.flowstate.R
 import com.example.flowstate.models.AssignmentEditViewModel
 import java.util.Calendar
 import java.util.TimeZone
@@ -81,13 +84,16 @@ fun AssignmentDetailsEditScreen(
 
     val context = LocalContext.current
 
+    val newSubtaskLabel = stringResource(R.string.new_subtask)
+    val changesSavedMessage = stringResource(R.string.changes_saved)
+
     fun markChanged() { unsavedChanges = true }
 
     // TOP APP BAR
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Edit Assignment") },
+                title = { Text(stringResource(R.string.edit_assignment)) },
 
                 navigationIcon = {
                     IconButton(onClick = {
@@ -96,7 +102,7 @@ fun AssignmentDetailsEditScreen(
                     }) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
@@ -123,10 +129,11 @@ fun AssignmentDetailsEditScreen(
                         )
 
                         viewModel.save(updated)
-                        Toast.makeText(context, "Changes Saved", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, changesSavedMessage, Toast.LENGTH_SHORT).show()
+
                         navController.popBackStack()
                     }) {
-                        Icon(Icons.Default.Check, contentDescription = "Save Changes")
+                        Icon(Icons.Default.Check, contentDescription = stringResource(R.string.save_changes))
                     }
 
                 }
@@ -157,7 +164,8 @@ fun AssignmentDetailsEditScreen(
                     onAddSubtask = {
                         subtasks = subtasks + Subtask(
                             assignmentId = assignment.id,
-                            text = "New Subtask"
+                            text = newSubtaskLabel
+
                         )
                         markChanged()
                     }
@@ -174,9 +182,9 @@ fun AssignmentDetailsEditScreen(
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete assignment")
+                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete_assignment))
                     Spacer(Modifier.width(8.dp))
-                    Text("Delete Assignment")
+                    Text(stringResource(R.string.delete_assignment))
                 }
 
             }
@@ -185,7 +193,7 @@ fun AssignmentDetailsEditScreen(
             if (subtaskWeightError) {
                 item {
                     Text(
-                        "Subtask weights must total 100%",
+                        stringResource(R.string.subtask_weights_must_total_100),
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(12.dp)
                     )
@@ -196,26 +204,34 @@ fun AssignmentDetailsEditScreen(
         }
     }
 
+    val deleteAssignmentMessage = stringResource(R.string.delete_assignment)
+    val deleteConfirmLabel = stringResource(R.string.delete)
+    val cancelLabel = stringResource(R.string.cancel)
+    val deletePrompt = stringResource(R.string.are_you_sure_this_cannot_be_undone)
+
     // DELETE DIALOG
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Assignment") },
-            text = { Text("Are you sure? This cannot be undone.") },
+            title = { Text(deleteAssignmentMessage) },
+            text = { Text(deletePrompt) },
             confirmButton = {
                 TextButton(
                     onClick = {
                         showDeleteDialog = false
                         viewModel.delete()
-                        Toast.makeText(context, "Assignment deleted", Toast.LENGTH_SHORT).show()
+
+                        // Use pre-fetched deleteAssignmentMessage here
+                        Toast.makeText(context, deleteAssignmentMessage, Toast.LENGTH_SHORT).show()
+
                         navController.popBackStack()
                         navController.popBackStack()
                     }
-                ) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+                ) { Text(deleteConfirmLabel, color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(cancelLabel)
                 }
             }
         )
@@ -225,19 +241,19 @@ fun AssignmentDetailsEditScreen(
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
-            title = { Text("Discard changes?") },
-            text = { Text("You have unsaved changes. Exit without saving?") },
+            title = { Text(stringResource(R.string.discard_changes)) },
+            text = { Text(stringResource(R.string.you_have_unsaved_changes_exit_without_saving)) },
             confirmButton = {
                 TextButton(onClick = {
                     showExitDialog = false
                     navController.popBackStack()
                 }) {
-                    Text("Discard")
+                    Text(stringResource(R.string.discard))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showExitDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -260,7 +276,7 @@ fun EditableAssignmentCard(
     onSubtasksChange: (List<Subtask>) -> Unit,
     onAddSubtask: () -> Unit,
     dueDate: Long,
-    onDueDateChange: (Long) -> Unit
+    onDueDateChange: (Long) -> Unit,
 
 ) {
     val cs = MaterialTheme.colorScheme
@@ -278,7 +294,7 @@ fun EditableAssignmentCard(
         OutlinedTextField(
             value = title,
             onValueChange = onTitleChange,
-            label = { Text("Assignment Title") },
+            label = { Text(stringResource(R.string.assignment_title)) },
             modifier = Modifier.fillMaxWidth(),
             textStyle = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Next),
@@ -294,9 +310,9 @@ fun EditableAssignmentCard(
                 // .clickable { ... } (managed by the composable for datetimepiecker)
                 .padding(vertical = 8.dp)
         ) {
-            Icon(Icons.Default.CalendarMonth, contentDescription = "Change due date")
+            Icon(Icons.Default.CalendarMonth, contentDescription = stringResource(R.string.change_due_date))
             Spacer(Modifier.width(8.dp))
-            DateTimePicker( // Use the new composable here
+            DateTimePicker(
                 initialDateTime = dueDate,
                 onDateTimeSelected = onDueDateChange
             )
@@ -316,12 +332,12 @@ fun EditableAssignmentCard(
                             showDatePicker.value = false
                         }
                     ) {
-                        Text("OK")
+                        Text(stringResource(R.string.ok))
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { showDatePicker.value = false }) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                 }
             ) {
@@ -352,7 +368,7 @@ fun EditableAssignmentCard(
         Spacer(Modifier.height(20.dp))
 
         // Editable Subtasks
-        Text("Subtasks", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.subtasks), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
 
         subtasks.forEachIndexed { index, subtask ->
@@ -381,24 +397,24 @@ fun EditableAssignmentCard(
 
         // Add Subtask Button
         TextButton(onClick = onAddSubtask) {
-            Icon(Icons.Default.Add, contentDescription = "Add Subtask")
+            Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_subtask))
             Spacer(Modifier.width(4.dp))
-            Text("Add Subtask")
+            Text(stringResource(R.string.add_subtask))
         }
 
         Spacer(Modifier.height(20.dp))
 
         // Attachments Section
-        Text("Attachments", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.attachments), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
         Button(onClick = { /* TODO: Open file picker */ }) {
-            Text("Add Attachment")
+            Text(stringResource(R.string.add_attachment))
         }
 
         Spacer(Modifier.height(20.dp))
 
         // Editable Notes
-        Text("Notes", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.notes), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(
             value = notes,
@@ -406,7 +422,7 @@ fun EditableAssignmentCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(150.dp),
-            placeholder = { Text("Add your notes here...") }
+            placeholder = { Text(stringResource(R.string.add_your_notes_here)) }
         )
     }
 }
@@ -467,10 +483,10 @@ fun DateTimePicker(
                             showDatePicker.value = false
                         }
                     }
-                ) { Text("OK") }
+                ) { Text(stringResource(R.string.ok)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDatePicker.value = false }) { Text("Cancel") }
+                TextButton(onClick = { showDatePicker.value = false }) { Text(stringResource(R.string.cancel)) }
             }
         ) {
             DatePicker(state = datePickerState)
@@ -505,11 +521,11 @@ fun DateTimePicker(
                         onDateTimeSelected(estCalendar.timeInMillis)
                         showTimePicker.value = false
                     }
-                ) { Text("OK") }
+                ) { Text(stringResource(R.string.ok)) }
             },
             title = {
                 Text(
-                    text = "Select Due Time",
+                    text = stringResource(R.string.select_due_time),
                     modifier = Modifier.padding(start = 24.dp, top = 24.dp, end = 24.dp)
                 )
             }
@@ -538,23 +554,23 @@ fun EditableSubtaskRow(
             modifier = Modifier.weight(1f),
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Done),
             singleLine = true,
-            label = { Text("Subtask Name") }
+            label = { Text(stringResource(R.string.subtask_name)) }
         )
 
         // Subtask Weight Input
         OutlinedTextField(
             value = if (subtask.weight > 0) subtask.weight.toString() else "",
             onValueChange = onWeightChange,
-            label = { Text("Wgt %") },
+            label = { Text(stringResource(R.string.wgt)) },
             modifier = Modifier.width(80.dp),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
             singleLine = true,
             textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center),
-            placeholder = {Text("0")}
+            placeholder = {Text(stringResource(R.string._0))}
         )
 
         IconButton(onClick = onDelete) {
-            Icon(Icons.Default.Delete, contentDescription = "Delete Subtask")
+            Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete_subtask))
         }
     }
 }
@@ -567,7 +583,7 @@ fun CourseDropdown(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val courses = remember { mutableStateListOf("Programming", "Math", "Writing", "Design") }
+    val courses = stringArrayResource(id = R.array.course_list)
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -578,7 +594,7 @@ fun CourseDropdown(
             readOnly = true,
             value = selectedCourse,
             onValueChange = {},
-            label = { Text("Course") },
+            label = { Text(stringResource(R.string.course)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
             modifier = Modifier.menuAnchor()
         )
@@ -596,7 +612,7 @@ fun CourseDropdown(
                 )
             }
             DropdownMenuItem(
-                text = { Text("Add New Course...", fontWeight = FontWeight.Bold) },
+                text = { Text(stringResource(R.string.add_new_course), fontWeight = FontWeight.Bold) },
                 onClick = { /* TODO: Show a dialog to add a new course */
                     expanded = false
                 }
@@ -613,7 +629,8 @@ fun PriorityDropdown(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val priorityMap = mapOf(0 to "Low", 1 to "Medium", 2 to "High")
+    val priorityNames = stringArrayResource(id = R.array.priority_levels)
+
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -622,9 +639,11 @@ fun PriorityDropdown(
     ) {
         OutlinedTextField(
             readOnly = true,
-            value = priorityMap[selectedPriority] ?: "Unknown",
+            // Use the selectedPriority as an index to get the correct name
+            // Add a check to prevent crashes if the index is out of bounds
+            value = priorityNames.getOrElse(selectedPriority) { stringResource(R.string.unknown) },
             onValueChange = {},
-            label = { Text("Priority") },
+            label = { Text(stringResource(R.string.priority)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
             modifier = Modifier.menuAnchor()
         )
@@ -632,11 +651,13 @@ fun PriorityDropdown(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            priorityMap.forEach { (priorityValue, priorityName) ->
+            // Iterate over the array with index
+            priorityNames.forEachIndexed { index, priorityName ->
                 DropdownMenuItem(
                     text = { Text(priorityName) },
                     onClick = {
-                        onPriorityChange(priorityValue)
+                        // The index is the priority value (0, 1, 2)
+                        onPriorityChange(index)
                         expanded = false
                     }
                 )
@@ -645,6 +666,7 @@ fun PriorityDropdown(
     }
 }
 
+// this is for preview only, not actually for app, UI text shoudln't need to be put into string resources
 @Preview(showBackground = true)
 @Composable
 fun AssignmentDetailsEditScreenPreview() {
