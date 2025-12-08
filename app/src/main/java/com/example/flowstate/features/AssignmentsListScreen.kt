@@ -116,16 +116,6 @@ fun AssignmentsListScreen(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomEnd
             ) {
-                /*FloatingActionButton(
-                    onClick = {
-                        // navigate to add assignment screen
-                        navController.navigate("AssignmentDetailsScreen")
-                    },
-                    containerColor = Color(0xFFFBDE98),
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Assignment", tint = Color.Black)
-                }*/
                 FloatingActionButton(
                     onClick = {
                         navController.navigate(Screen.AssignmentAdd.route)

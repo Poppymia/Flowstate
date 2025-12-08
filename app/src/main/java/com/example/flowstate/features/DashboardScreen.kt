@@ -90,7 +90,7 @@ fun DashboardContent(
             )
             Text(
                 text = quote,
-                style = MaterialTheme.typography.bodyMedium.copy(
+                style = MaterialTheme.typography.bodyLarge.copy(
                     color = Color.DarkGray
                 )
             )
@@ -98,13 +98,12 @@ fun DashboardContent(
             if (author.isNotEmpty()) {
                 Text(
                     text = "- $author",
-                    style = MaterialTheme.typography.bodySmall.copy(
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         color = Color.Gray
                     )
                 )
             }
         }
-
         Spacer(modifier = Modifier.height(24.dp))
 
         // WEEK ROW
@@ -118,7 +117,6 @@ fun DashboardContent(
                 )
             }
         }
-
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
